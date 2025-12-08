@@ -1,0 +1,201 @@
+/* Import Poppins with many weights */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    font-family: "Poppins", sans-serif; /* 🔥 GLOBAL FONT */
+  }
+
+  body {
+    @apply antialiased;
+    font-weight: 400; /* base weight */
+  }
+}
+
+button,
+a,
+input,
+
+textarea,
+select {
+  font-family: inherit; /* inherits Poppins */
+  font-weight: 500; /* strong CTA weight */
+}
+
+@layer utilities {
+  /* Target only what we need when visible */
+  .animate-visible {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fadeIn {
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .animate-slideUp {
+    animation: slideUp 0.4s ease-out;
+  }
+}
+
+/* Base for all scroll-in elements */
+.animate-on-scroll {
+  opacity: 0;
+  transform: translate3d(0, 16px, 0);
+  will-change: opacity, transform;
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+/* Cards that already have translate-x via Tailwind will smoothly animate back to 0 */
+.animate-on-scroll.animate-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Product and feature cards – GPU hint */
+.product-card,
+.feature-card {
+  will-change: opacity, transform;
+  transform: translateZ(0);
+}
+
+/* Hero & logo scroll-driven elements */
+#logo-wrapper,
+#hero-content {
+  will-change: opacity, transform;
+}
+
+/* Shared GPU-friendly transition for heavy elements */
+.gpu-card {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Smooth transitions but only on cheap properties */
+.smooth-card {
+  transition-property: transform, opacity, box-shadow, border-color,
+    background-color;
+  transition-duration: 0.8s;
+  transition-timing-function: ease-out;
+}
+
+/* Glass button: no blur by default, blur only when hovered */
+.btn-glass {
+  background-color: rgba(255, 255, 255, 0.06);
+  backdrop-filter: none;
+}
+.btn-glass:hover {
+  backdrop-filter: blur(6px);
+}
+
+/* Icon glass effect – blur only on hover (why-us icons) */
+.icon-glass {
+  backdrop-filter: none;
+}
+.icon-glass:hover {
+  backdrop-filter: blur(8px);
+}
+
+/* Product card inner glass – blur on hover only */
+.product-card-inner {
+  backdrop-filter: none;
+}
+.product-card-inner:hover {
+  backdrop-filter: blur(10px);
+}
+
+/* Feature card inner – subtle hover blur for depth */
+.feature-card-inner {
+  backdrop-filter: none;
+}
+.feature-card-inner:hover {
+  backdrop-filter: blur(8px);
+}
+
+/* Fire Particle Animations – transform + opacity only (GPU-safe) */
+@keyframes ember {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.8;
+  }
+  25% {
+    transform: translate3d(-5px, -100px, 0) scale(1.2);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translate3d(5px, -200px, 0) scale(1.1);
+    opacity: 0.7;
+  }
+  75% {
+    transform: translate3d(-3px, -300px, 0) scale(0.9);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate3d(0, -400px, 0) scale(0.5);
+    opacity: 0;
+  }
+}
+
+@keyframes spark {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.7;
+  }
+  30% {
+    transform: translate3d(0, -80px, 0) scale(1.5);
+    opacity: 0.9;
+  }
+  60% {
+    transform: translate3d(0, -150px, 0) scale(1.2);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate3d(0, -250px, 0) scale(0.8);
+    opacity: 0;
+  }
+}
+
+/* Apply animations */
+.animate-ember {
+  animation: ember linear infinite;
+  will-change: transform, opacity;
+}
+
+.animate-spark {
+  animation: spark linear infinite;
+  will-change: transform, opacity;
+}
+
+/* Performance optimizations for particles */
+.animate-ember,
+.animate-spark {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  contain: content;
+}
