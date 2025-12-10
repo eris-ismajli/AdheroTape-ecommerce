@@ -5,6 +5,10 @@
 @tailwind components;
 @tailwind utilities;
 
+.test {
+  color: rgb(14, 14, 18);
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -14,6 +18,7 @@
   body {
     @apply antialiased;
     font-weight: 400; /* base weight */
+    color: white;
   }
 }
 

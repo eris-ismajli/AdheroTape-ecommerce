@@ -1,0 +1,25 @@
+@keyframes gradientSweep {
+  0% {
+    background-position: -100% -100%;
+  }
+  100% {
+    background-position: 200% 200%;
+  }
+}
+
+.group:hover {
+  animation: pulseGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 5px rgba(255, 255, 0, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(255, 255, 0, 0.4);
+  }
+}
+
+.test {
+  color: ;
+}
