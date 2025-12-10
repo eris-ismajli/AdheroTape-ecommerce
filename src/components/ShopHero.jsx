@@ -100,37 +100,10 @@ const ShopHero = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-screen bg-gradient-to-br from-[#0B0B0D] via-[#121218] to-[#0B0B0D] text-white flex items-center overflow-hidden "
+      className="relative min-h-screen text-white flex items-center overflow-hidden "
     >
-      {/* Animated background elements - MORE SPREAD OUT AND DILATED */}
-      <div className="absolute inset-0 overflow-hidden">
-        {/* Primary blobs - spread to corners */}
-        <div className="absolute -top-40 -left-40 w-[800px] h-[800px] bg-yellow-400/7 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute -bottom-40 -right-40 w-[800px] h-[800px] bg-blue-400/5 rounded-full blur-[120px] animate-pulse delay-700" />
 
-        {/* Secondary blobs - more spread out */}
-        <div className="absolute top-1/3 -right-20 w-[600px] h-[600px] bg-purple-400/4 rounded-full blur-[100px] animate-pulse delay-300" />
-        <div className="absolute bottom-1/3 -left-20 w-[600px] h-[600px] bg-cyan-400/3 rounded-full blur-[100px] animate-pulse delay-500" />
-
-        {/* Corner accent blobs */}
-        <div className="absolute top-0 right-1/4 w-[400px] h-[400px] bg-yellow-400/3 rounded-full blur-[80px] animate-pulse delay-900" />
-        <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] bg-blue-400/4 rounded-full blur-[80px] animate-pulse delay-1100" />
-
-        {/* Center glow - more dilated */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-gradient-to-r from-yellow-400/8 via-transparent to-blue-400/8 rounded-full blur-[150px] opacity-40" />
-
-        {/* Grid pattern */}
-        <div
-          className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage: `linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px),
-                              linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px)`,
-            backgroundSize: "80px 80px",
-          }}
-        />
-      </div>
-
-      <div className="container mx-auto px-6 py-24 pt-28 lg:px-20 grid lg:grid-cols-2 gap-20 z-10">
+      <div className="container mx-auto px-6 py-10 pt-28 lg:px-20 grid lg:grid-cols-2 gap-20 z-10">
         {/* LEFT */}
         <div
           className={`flex flex-col justify-center transition-all duration-1000 ${
@@ -139,7 +112,7 @@ const ShopHero = () => {
         >
           {/* Heading with gradient */}
           <h1 className="text-6xl lg:text-7xl font-bold leading-tight mb-8">
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-yellow-400">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-yellow-400">
               Discover
             </span>
             <br />
@@ -249,11 +222,10 @@ const ShopHero = () => {
 
           <div
             style={{ color: "rgb(1, 160, 242)" }}
-            className="absolute top-10 right-10 bg-gradient-to-br  text-black font-black px-6 py-3 rounded-xl shadow-2xl shadow-blue-400/40 animate-bounce-slow hover:animate-none hover:scale-110 transition-transform duration-300"
+            className="absolute top-10 right-10 bg-gray-950 font-black px-6 py-3 rounded-xl shadow-2xl shadow-blue-400/40 animate-bounce-slow transition-transform duration-300"
           >
             <div className="text-sm">LIMITED TIME</div>
             <div className="text-2xl">30% OFF</div>
-            <div className="text-[10px] opacity-90">Use code: PREMIUM30</div>
           </div>
 
           {/* Floating Elements - More spread out */}

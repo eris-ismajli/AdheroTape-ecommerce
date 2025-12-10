@@ -13,7 +13,7 @@ import {
 
 const Footer = ({ showQuickLinks }) => {
   return (
-    <footer id="contact" className="bg-zinc-950 py-16 border-t border-zinc-800">
+    <footer id="contact" className="bg-black/50 py-16 border-t border-white/5 w-full">
       <div className="container mx-auto px-20">
         <div className="flex items-center justify-between gap-12 mb-12">
           <div>

@@ -5,8 +5,21 @@
 @tailwind components;
 @tailwind utilities;
 
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #262626;
+  border-radius: 5px;
+}
+
 .test {
-  color: rgb(14, 14, 18);
+  color: rgb(195, 107, 0);
 }
 
 @layer base {
@@ -25,7 +38,6 @@
 button,
 a,
 input,
-
 textarea,
 select {
   font-family: inherit; /* inherits Poppins */

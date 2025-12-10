@@ -2,22 +2,33 @@ import React from "react";
 
 import logoNoText from "../assets/logo-notext.png";
 import { useNavigate } from "react-router-dom";
+import { Search } from "lucide-react";
 
-const Header = ({ navLinks, navButtons, showShop = false }) => {
+const Header = ({
+  navLinks,
+  navButtons,
+  showShop = false,
+  showSearch = false,
+  isAsideSticky,
+}) => {
   const navigate = useNavigate();
 
-  const navigateTo = (endpoint) => {
-    navigate(endpoint);
-    window.scrollTo({ top: 0, behavior: "instant" });
-  };
-  
   return (
     <header
-      className="fixed top-0 w-full z-40 transition-colors duration-300 bg-black/55 backdrop-blur-md"
-      style={{ borderBottom: "1px solid rgba(128, 128, 128, 0.142)" }}
+      className={`
+    fixed top-2 ${
+      isAsideSticky ? "left-[60.7%]" : "left-[50%]"
+    } -translate-x-1/2
+    z-40 bg-black/55 backdrop-blur-md rounded-full
+    transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]
+    w-[75%] shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_0_12px_rgba(255,255,255,0.06)]
+
+
+  `}
+      style={{ borderTop: "1px solid rgba(255, 255, 255, 0.18)" }}
     >
       <nav
-        className="md:flex gap-8 mx-16 my-3"
+        className="md:flex gap-8 mx-4 my-3"
         style={{ alignItems: "center", justifyContent: "space-between" }}
       >
         <div className="flex items-center gap-2">
@@ -39,10 +50,19 @@ const Header = ({ navLinks, navButtons, showShop = false }) => {
                   if (el) el.scrollIntoView({ behavior: "smooth" });
                 } else {
                   // NORMAL NAVIGATION when endpoint is a route
-                  navigateTo(link.endpoint);
+                  navigate(link.endpoint);
                 }
               }}
-              className="relative text-white hover:text-yellow-400 transition-colors duration-300 after:content-[''] after:absolute after:left-0 after:-bottom-1 after:h-[2px] after:w-0 after:bg-yellow-400 after:transition-all after:duration-300 hover:after:w-full hover:-translate-y-0.5 inline-block"
+              className="
+  relative text-white/70 transition-all duration-300 
+  hover:text-yellow-300 
+  hover:-translate-y-0.5
+  after:content-[''] after:absolute after:left-1/2 after:-bottom-1
+  after:h-[2px] after:w-0 after:bg-yellow-400 after:rounded-full
+  after:transition-all after:duration-300 after:-translate-x-1/2
+  hover:after:w-full
+  hover:after:shadow-[0_0_10px_rgba(255,215,0,0.6)]
+"
               style={{
                 background: "transparent",
                 border: "none",
@@ -55,20 +75,54 @@ const Header = ({ navLinks, navButtons, showShop = false }) => {
         </div>
 
         <div className="flex items-center gap-7">
+          {/* SEARCH BAR */}
+          {showSearch && (
+            <div
+              style={{ borderTop: "1px solid rgba(255, 255, 255, 0.18)" }}
+              className="
+    relative
+    flex items-center
+    bg-black/30
+   
+    rounded-full
+    px-4 py-2
+    shadow-[inset_0_0_8px_rgba(255,255,255,0.08)]
+    transition-all duration-300
+
+    focus-within:border-blue-300
+    focus-within:shadow-[0_0_8px_rgba(140,180,255,0.35)]
+  "
+            >
+              <Search color="gray" size={20} />
+
+              <input
+                type="text"
+                placeholder="Search..."
+                className="
+      bg-transparent outline-none border-none text-sm text-white ml-2
+      placeholder-gray-400
+      w-[140px] focus:w-[180px]
+      transition-all duration-300
+    "
+              />
+            </div>
+          )}
+
           {navButtons &&
             navButtons.map((button, index) => {
               const Icon = button.icon;
               return (
                 <button
                   key={index}
+                  style={{ borderTop: "1px solid rgba(255, 255, 255, 0.18)" }}
                   className="
-    flex items-center gap-2 p-2.5
-    transition-all duration-300 ease-in-out
-    bg-black/30
-    scale-105 shadow-lg
-    border border-white/30 rounded-full
-    hover:border-yellow-100 hover:shadow-[0_0_6px_rgba(255,255,0,0.6)]
-  "
+  flex items-center gap-2 p-2.5
+  bg-black/30 rounded-full scale-105
+  transition-shadow duration-300 ease-out
+
+  shadow-[0_0_0_rgba(80,140,255,0),inset_0_0_8px_rgba(255,255,255,0.08)]
+  hover:shadow-[0_0_18px_rgba(80,140,255,0.45),inset_0_0_8px_rgba(255,255,255,0.08)]
+"
                 >
                   <Icon size={18} color="white" />
                 </button>
@@ -77,7 +131,7 @@ const Header = ({ navLinks, navButtons, showShop = false }) => {
 
           {showShop && (
             <button
-              onClick={() => navigateTo("/shop")}
+              onClick={() => navigate("/shop")}
               className="
     border-2 border-yellow-500 text-white px-6 py-2 rounded-full font-bold
     bg-black/20
