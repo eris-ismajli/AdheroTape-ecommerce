@@ -1,21 +1,29 @@
-import React, { useEffect, useState, useRef } from "react";
-import { ShoppingCart, ShoppingBag } from "lucide-react";
+import React, { useEffect, useState, useRef, useContext } from "react";
+import { ShoppingCart, ShoppingBag, Search, Check, Loader2 } from "lucide-react";
 import FilterDropdown from "./FilterDropdown";
+import axiosInstance from "../utils/axiosInstance";
+
+import { useDispatch } from "react-redux";
+import { addToCart } from "../store/cart/actions";
 
 const ProductsList = ({ setIsAsideSticky }) => {
+  const dispatch = useDispatch();
+
   const [products, setProducts] = useState([]);
   const asideRef = useRef(null);
   const containerRef = useRef(null);
 
   useEffect(() => {
-    fetch("http://localhost:4000/shop")
-      .then((res) => res.json())
-      .then((data) => {
-        setProducts(data);
-      })
-      .catch((err) => {
-        console.error("Error fetching products:", err);
-      });
+    const fetchProducts = async () => {
+      try {
+        const response = await axiosInstance.get("/shop");
+        setProducts(response.data);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    fetchProducts();
   }, []);
 
   useEffect(() => {
@@ -94,16 +102,72 @@ const ProductsList = ({ setIsAsideSticky }) => {
     };
   }, [setIsAsideSticky]);
 
+  const categoryFilters = [
+    { name: "All" },
+    { name: "Duct Tape" },
+    { name: "Masking Tape" },
+    { name: "Vinyl Tape" },
+  ];
+
+  const [categoryFilter, setCategoryFilter] = useState(() => {
+    return localStorage.getItem("categoryFilter") || "All";
+  });
+  const [tapeNumber, setTapeNumber] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const [addingStates, setAddingStates] = useState({});
+  const [successStates, setSuccessStates] = useState({});
+
+  useEffect(() => {
+    const saved = localStorage.getItem("categoryFilter");
+    if (saved) setCategoryFilter(saved);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("categoryFilter", categoryFilter);
+  }, [categoryFilter]);
+
+  const filteredProducts = products.filter((product) => {
+    const matchesCategory =
+      categoryFilter === "All" ||
+      product.category?.toLowerCase() === categoryFilter.toLowerCase();
+
+    const matchesSearch = product.title
+      ?.toLowerCase()
+      .includes(searchQuery.toLowerCase());
+
+    return matchesCategory && matchesSearch;
+  });
+
+  useEffect(() => {
+    setTapeNumber(filteredProducts.length);
+  }, [filteredProducts]);
+
+  const handleAddToCart = (product, index) => {
+    // Set loading state
+    setAddingStates((prev) => ({ ...prev, [index]: true }));
+
+    // Simulate API call delay if needed
+    setTimeout(() => {
+      dispatch(addToCart(product));
+
+      // Set success state
+      setAddingStates((prev) => ({ ...prev, [index]: false }));
+      setSuccessStates((prev) => ({ ...prev, [index]: true }));
+
+      // Reset success state after 2 seconds
+      setTimeout(() => {
+        setSuccessStates((prev) => ({ ...prev, [index]: false }));
+      }, 2500);
+    }, 300); // Small delay for better UX
+  };
+
   return (
     <section className="relative py-32 text-white border-b border-white/5">
-      <div className="absolute inset-0 overflow-hidden">
-        {/* Background effects can go here */}
-      </div>
-
       {/* TITLE */}
       <div className="text-center transition-all duration-1000 opacity-100 translate-y-0">
         <h2 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-yellow-400">
-          Our Product Range
+          Find your tape
         </h2>
         <p className="text-gray-400 text-lg mt-4">
           Industrial-grade tapes for every purpose — durable, reliable, and
@@ -111,9 +175,63 @@ const ProductsList = ({ setIsAsideSticky }) => {
         </p>
       </div>
 
+      {/* Category Filter */}
+      <div className="mt-16 mx-20 flex gap-6 justify-between">
+        <div className="flex gap-6 max-h-10">
+          {categoryFilters.map((filter, index) => (
+            <button
+              onClick={() => setCategoryFilter(filter.name)}
+              key={index}
+              className={`border border-yellow-400 px-4 py-1 rounded-full font-normal 
+           transition-all duration-300 
+           hover:bg-yellow-400 hover:text-black ${
+             filter.name === categoryFilter
+               ? "bg-yellow-400 text-black"
+               : "bg-transparent text-white"
+           }`}
+            >
+              {filter.name}
+            </button>
+          ))}
+        </div>
+        {/* Search Tapes */}
+        <div>
+          <div className="relative flex items-center max-w-md transition-all duration-300">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search color="gray" size={18} />
+            </div>
+            <input
+              type="search"
+              className="
+    w-[15rem]
+    pl-10 pr-4 py-2 font-normal rounded-full border border-gray-500
+    focus:w-[20rem]
+    focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent
+    transition-all duration-300 bg-black/25
+  "
+              placeholder="Search Tapes..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </div>
+      </div>
+
+      <h1
+        style={{ borderTop: "1px solid rgba(255, 255, 255, 0.18)" }}
+        className="shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_0_12px_rgba(255,255,255,0.04)]
+ lg:block w-72 shrink-0 bg-gradient-to-b from-black/0 to-black/20
+ rounded-2xl p-3 px-6 ml-6 mt-6"
+      >
+        {categoryFilter.endsWith("Tape")
+          ? `${categoryFilter}s`
+          : `${categoryFilter} Tapes`}
+        : {tapeNumber}
+      </h1>
+
       {/* LAYOUT: SIDEBAR + PRODUCT GRID */}
       <div
-        className="container mx-auto mt-20 px-6 flex gap-10 relative"
+        className="container mx-auto mt-5 px-6 flex gap-10 relative"
         ref={containerRef}
       >
         {/* FILTER SIDEBAR */}
@@ -160,11 +278,20 @@ const ProductsList = ({ setIsAsideSticky }) => {
           <FilterDropdown
             label="Category"
             options={[
+              "Carton Seal",
+              "Double Sided",
               "Duct Tape",
-              "Packaging Tape",
-              "Electrical Tape",
+              "Filament Tape",
+              "Foam Tape",
+              "Gaffers Tape",
+              "High Bond Tape",
               "Masking Tape",
+              "Poly Tape",
+              "Vinyl Tape",
+              "3M Safety",
+              "GaffGun",
             ]}
+            setCategoryFilter={setCategoryFilter}
           />
 
           {/* WIDTH FILTER */}
@@ -200,8 +327,10 @@ const ProductsList = ({ setIsAsideSticky }) => {
 
         {/* PRODUCT GRID */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-10 flex-1">
-          {products.map((product, i) => {
+          {filteredProducts.map((product, i) => {
             const mainImage = product.images?.[0] ?? "/placeholder-tape.png";
+            const isAdding = addingStates[i];
+            const isSuccess = successStates[i];
             return (
               <div
                 key={product.id ?? i}
@@ -255,14 +384,69 @@ bg-gradient-to-b from-black/100 to-black/0  rounded-2xl overflow-hidden transfor
                     </span>
                   </div>
                 </div>
-                <div className="w-[92%] absolute bottom-4 self-center justify-self-center flex flex-col items-center justify-center gap-3 ">
-                  <button className="w-full bg-black/15 flex items-center justify-center gap-2 text-gray-500 border border-zinc-800 hover:text-yellow-200 hover:border-yellow-200 font-semibold py-3 rounded-xl hover:shadow-lg hover:shadow-yellow-400/30 transition-all duration-300">
-                    <ShoppingBag className="w-5 h-5" />
+                <div className="w-[92%] absolute bottom-4 self-center justify-self-center flex flex-col items-center justify-center gap-3">
+                  <button className="w-full bg-black/15 flex items-center justify-center gap-2 text-yellow-200 border border-zinc-800 hover:text-yellow-200 hover:border-yellow-200 font-semibold py-3 rounded-xl hover:shadow-lg hover:shadow-yellow-400/30 transition-all duration-300">
+                    <ShoppingBag className="w-5 h-5 text-yellow-200" />
                     Add to Wishlist
                   </button>
-                  <button className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-semibold py-3 rounded-xl hover:shadow-lg hover:shadow-yellow-400/30 transition-all duration-300">
-                    <ShoppingCart className="w-5 h-5" />
-                    Add to Cart
+
+                  {/* Refined Add to Cart Button */}
+                  <button
+                    onClick={() => handleAddToCart(product, i)}
+                    disabled={isAdding || isSuccess}
+                    className={`
+                    w-full flex items-center justify-center gap-2 relative
+                    ${
+                      isAdding
+                        ? "bg-gradient-to-r from-blue-400 to-blue-500"
+                        : isSuccess
+                        ? "bg-gradient-to-r from-green-400 to-green-500 animate-success-pulse"
+                        : "bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 hover:to-yellow-400"
+                    }
+                    text-black font-semibold py-3 rounded-xl 
+                    transition-all duration-300 ease-out
+                    ${
+                      !(isAdding || isSuccess) &&
+                      "hover:shadow-lg hover:shadow-yellow-400/30 hover:scale-[1.02]"
+                    }
+                    ${isAdding && "cursor-not-allowed"}
+                    ${isSuccess && "cursor-default"}
+                    overflow-hidden
+                  `}
+                  >
+                    {/* Background shine effect on hover */}
+                    {!(isAdding || isSuccess) && (
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+                    )}
+
+                    {/* Button content */}
+                    <div
+                      className={`flex items-center justify-center gap-2 transition-all duration-300
+                    ${isAdding || isSuccess ? "opacity-0" : "opacity-100"}
+                  `}
+                    >
+                      <ShoppingCart className="w-5 h-5" />
+                      Add to Cart
+                    </div>
+
+                    {/* Button text that changes */}
+                    <div
+                      className={`absolute flex items-center justify-center gap-2 transition-all duration-300
+                    ${isAdding ? "opacity-100" : "opacity-0"}
+                  `}
+                    >
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Adding...
+                    </div>
+
+                    <div
+                      className={`absolute flex items-center justify-center gap-2 transition-all duration-300
+                    ${isSuccess ? "opacity-100" : "opacity-0"}
+                  `}
+                    >
+                      <Check className="w-5 h-5" />
+                      Added to Cart!
+                    </div>
                   </button>
                 </div>
               </div>

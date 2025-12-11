@@ -1,5 +1,9 @@
 import React from "react";
 
+import { useSelector } from "react-redux";
+import { selectCartCount } from "../store/cart/selectors";
+import { ShoppingCart } from "lucide-react";
+
 import logoNoText from "../assets/logo-notext.png";
 import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
@@ -12,6 +16,8 @@ const Header = ({
   isAsideSticky,
 }) => {
   const navigate = useNavigate();
+
+  const cartCount = useSelector(selectCartCount);
 
   return (
     <header
@@ -112,20 +118,37 @@ const Header = ({
             navButtons.map((button, index) => {
               const Icon = button.icon;
               return (
-                <button
-                  key={index}
-                  style={{ borderTop: "1px solid rgba(255, 255, 255, 0.18)" }}
-                  className="
-  flex items-center gap-2 p-2.5
-  bg-black/30 rounded-full scale-105
-  transition-shadow duration-300 ease-out
-
-  shadow-[0_0_0_rgba(80,140,255,0),inset_0_0_8px_rgba(255,255,255,0.08)]
-  hover:shadow-[0_0_18px_rgba(80,140,255,0.45),inset_0_0_8px_rgba(255,255,255,0.08)]
-"
-                >
-                  <Icon size={18} color="white" />
-                </button>
+                <div className="relative" key={index}>
+                  <button
+                    onClick={() => navigate(button.endpoint)}
+                    style={{ borderTop: "1px solid rgba(255, 255, 255, 0.18)" }}
+                    className="
+                flex items-center gap-2 p-2.5
+                bg-black/30 rounded-full scale-105
+                transition-shadow duration-300 ease-out
+                
+                shadow-[0_0_0_rgba(80,140,255,0),inset_0_0_8px_rgba(255,255,255,0.08)]
+                hover:shadow-[0_0_18px_rgba(80,140,255,0.45),inset_0_0_8px_rgba(255,255,255,0.08)]
+                "
+                  >
+                    <Icon size={18} color="white" />
+                  </button>
+                  {button.name === "Cart" && cartCount > 0 && (
+                    <span
+                      className="
+        absolute -top-1 -right-1
+        bg-yellow-400 text-black
+        text-xs font-bold
+        rounded-full
+        h-5 min-w-5 px-1
+        flex items-center justify-center
+        shadow-[0_0_10px_rgba(255,215,0,0.6)] pointer-events-none
+      "
+                    >
+                      {cartCount}
+                    </span>
+                  )}
+                </div>
               );
             })}
 

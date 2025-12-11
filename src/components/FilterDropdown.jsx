@@ -1,4 +1,4 @@
-const FilterDropdown = ({ label, options }) => {
+const FilterDropdown = ({ label, options, setCategoryFilter }) => {
   return (
     <div className="mb-8">
       <p className="text-sm text-gray-300 mb-3">{label}</p>
@@ -10,6 +10,7 @@ const FilterDropdown = ({ label, options }) => {
             rounded-xl px-4 py-3 appearance-none cursor-pointer
             focus:outline-none focus:border-blue-400 transition
           "
+          onChange={(e) => setCategoryFilter(e.target.value)}
         >
           <option value="">Select {label}</option>
           {options.map((opt) => (
@@ -36,4 +37,4 @@ const FilterDropdown = ({ label, options }) => {
   );
 };
 
-export default FilterDropdown
+export default FilterDropdown;

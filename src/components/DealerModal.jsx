@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { X } from "lucide-react";
+import axiosInstance from "../utils/axiosInstance";
 
 export default function DealerModal({ isOpen, onClose }) {
   const [formData, setFormData] = useState({
@@ -20,17 +21,14 @@ export default function DealerModal({ isOpen, onClose }) {
     setSubmitStatus("idle");
 
     try {
-      const response = await fetch("http://localhost:4000/dealer-application", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to submit application");
-      }
+      const response = await axiosInstance.post(
+        "/dealer-application",
+        formData
+      );
 
       setSubmitStatus("success");
+
+      // Reset form
       setFormData({
         company_name: "",
         contact_name: "",

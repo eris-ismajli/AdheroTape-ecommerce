@@ -141,17 +141,6 @@ const ShopHero = () => {
             </p>
           </div>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-16">
-            <button className="group relative bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold py-4 px-10 rounded-xl hover:shadow-2xl hover:shadow-yellow-400/30 transition-all duration-300 transform hover:-translate-y-1 overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-yellow-300 to-yellow-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <span className="relative flex items-center gap-3 text-lg">
-                <ArrowDown className="w-5 h-5" />
-                Find Your Tape
-              </span>
-            </button>
-          </div>
-
           {/* Enhanced Stats with icons */}
           <div
             ref={statsRef}

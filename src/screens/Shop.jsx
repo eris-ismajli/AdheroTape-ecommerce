@@ -14,8 +14,8 @@ const Shop = () => {
     { name: "About", endpoint: "/" },
   ];
   const navButtons = [
-    { name: "Profile", icon: UserRound },
-    { name: "Cart", icon: ShoppingCart },
+    { name: "Profile", icon: UserRound, endpoint: "/" },
+    { name: "Cart", icon: ShoppingCart, endpoint: "/cart" },
   ];
 
   const [isAsideSticky, setIsAsideSticky] = useState(false);
@@ -34,9 +34,14 @@ const Shop = () => {
 
       {/* CONTENT */}
       <div className="relative z-20 flex flex-col items-center justify-center ">
-        <Header navLinks={navLinks} navButtons={navButtons} showSearch={true} isAsideSticky={isAsideSticky}/>
+        <Header
+          navLinks={navLinks}
+          navButtons={navButtons}
+          showSearch={true}
+          isAsideSticky={isAsideSticky}
+        />
         <ShopHero />
-        <ProductsList setIsAsideSticky={setIsAsideSticky}/>
+        <ProductsList setIsAsideSticky={setIsAsideSticky} />
         <Footer showQuickLinks={false} />
       </div>
     </div>
