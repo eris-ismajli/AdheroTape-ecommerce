@@ -138,7 +138,7 @@ const Cart = () => {
 
                       <div
                         onClick={() =>
-                          window.open(`/shop/${item.id}`, "_blank")
+                          navigate(`/shop/${item.id}`, { replace: true })
                         }
                         className="
     cursor-pointer h-36 w-36 rounded-2xl bg-black/60 
@@ -167,7 +167,7 @@ const Cart = () => {
                           )}
                           <h2
                             onClick={() =>
-                              window.open(`/shop/${item.id}`, "_blank")
+                              navigate(`/shop/${item.id}`, { replace: true })
                             }
                             className="
     text-xl cursor-pointer font-normal 

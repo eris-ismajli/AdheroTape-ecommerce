@@ -6,9 +6,9 @@ import {
 } from "./constants";
 
 // add product to cart
-export const addToCart = (product) => ({
+export const addToCart = (product, quantity = 1) => ({
   type: ADD_TO_CART,
-  payload: product,
+  payload: { product, quantity },
 });
 
 // remove one quantity

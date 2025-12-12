@@ -19,7 +19,7 @@ const saveCart = (items) => {
 export default function cartReducer(state = initialState, action) {
   switch (action.type) {
     case ADD_TO_CART: {
-      const product = action.payload;
+      const { product, quantity } = action.payload;
       const existing = state.items.find((item) => item.id === product.id);
 
       let updatedItems;
@@ -27,11 +27,11 @@ export default function cartReducer(state = initialState, action) {
       if (existing) {
         updatedItems = state.items.map((item) =>
           item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
+            ? { ...item, quantity: item.quantity + quantity }
             : item
         );
       } else {
-        updatedItems = [...state.items, { ...product, quantity: 1 }];
+        updatedItems = [...state.items, { ...product, quantity }];
       }
 
       saveCart(updatedItems);

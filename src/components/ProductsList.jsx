@@ -32,7 +32,6 @@ const ProductsList = ({ setIsAsideSticky }) => {
     };
 
     fetchProducts();
-
   }, []);
 
   useEffect(() => {
@@ -124,7 +123,6 @@ const ProductsList = ({ setIsAsideSticky }) => {
   const [tapeNumber, setTapeNumber] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const [addingStates, setAddingStates] = useState({});
   const [successStates, setSuccessStates] = useState({});
 
   useEffect(() => {
@@ -153,22 +151,15 @@ const ProductsList = ({ setIsAsideSticky }) => {
   }, [filteredProducts]);
 
   const handleAddToCart = (product, index) => {
-    // Set loading state
-    setAddingStates((prev) => ({ ...prev, [index]: true }));
+    dispatch(addToCart(product));
 
-    // Simulate API call delay if needed
+    // Set success state
+    setSuccessStates((prev) => ({ ...prev, [index]: true }));
+
+    // Reset success state after 2 seconds
     setTimeout(() => {
-      dispatch(addToCart(product));
-
-      // Set success state
-      setAddingStates((prev) => ({ ...prev, [index]: false }));
-      setSuccessStates((prev) => ({ ...prev, [index]: true }));
-
-      // Reset success state after 2 seconds
-      setTimeout(() => {
-        setSuccessStates((prev) => ({ ...prev, [index]: false }));
-      }, 2500);
-    }, 300); // Small delay for better UX
+      setSuccessStates((prev) => ({ ...prev, [index]: false }));
+    }, 2000);
   };
 
   return (
@@ -342,7 +333,6 @@ const ProductsList = ({ setIsAsideSticky }) => {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-10 flex-1">
           {filteredProducts.map((product, i) => {
             const mainImage = product.images?.[0] ?? "/placeholder-tape.png";
-            const isAdding = addingStates[i];
             const isSuccess = successStates[i];
 
             return (
@@ -353,7 +343,7 @@ const ProductsList = ({ setIsAsideSticky }) => {
 bg-gradient-to-b from-black/100 to-black/0  rounded-2xl overflow-hidden transform transition-all duration-300 hover:-translate-y-2"
               >
                 <div
-                  onClick={() => window.open(`/shop/${product.id}`, "_blank")}
+                  onClick={() => navigate(`${product.id}`)}
                   className="relative w-full h-64 bg-black flex items-center justify-center overflow-hidden cursor-pointer"
                 >
                   <img
@@ -365,7 +355,7 @@ bg-gradient-to-b from-black/100 to-black/0  rounded-2xl overflow-hidden transfor
                 </div>
 
                 <div
-                  onClick={() => window.open(`/shop/${product.id}`, "_blank")}
+                   onClick={() => navigate(`${product.id}`)}
                   className="p-6 cursor-pointer"
                 >
                   {product.category && (
@@ -377,7 +367,10 @@ bg-gradient-to-b from-black/100 to-black/0  rounded-2xl overflow-hidden transfor
                     </p>
                   )}
 
-                  <h3 className="text-lg font-semibold text-white line-clamp-2">
+                  <h3
+                    className="text-lg font-semibold text-white transition-colors duration-300
+    hover:text-yellow-400 line-clamp-2"
+                  >
                     {product.title}
                   </h3>
 
@@ -413,50 +406,37 @@ bg-gradient-to-b from-black/100 to-black/0  rounded-2xl overflow-hidden transfor
                   {/* Refined Add to Cart Button */}
                   <button
                     onClick={() => handleAddToCart(product, i)}
-                    disabled={isAdding || isSuccess}
+                    disabled={isSuccess}
                     className={`
                     w-full flex items-center justify-center gap-2 relative
                     ${
-                      isAdding
-                        ? "bg-gradient-to-r from-blue-400 to-blue-500"
-                        : isSuccess
+                      isSuccess
                         ? "bg-gradient-to-r from-green-400 to-green-500 animate-success-pulse"
                         : "bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 hover:to-yellow-400"
                     }
                     text-black font-semibold py-3 rounded-xl 
                     transition-all duration-300 ease-out
                     ${
-                      !(isAdding || isSuccess) &&
+                      !isSuccess &&
                       "hover:shadow-lg hover:shadow-yellow-400/30 hover:scale-[1.02]"
                     }
-                    ${isAdding && "cursor-not-allowed"}
                     ${isSuccess && "cursor-default"}
                     overflow-hidden
                   `}
                   >
                     {/* Background shine effect on hover */}
-                    {!(isAdding || isSuccess) && (
+                    {!isSuccess && (
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
                     )}
 
                     {/* Button content */}
                     <div
                       className={`flex items-center justify-center gap-2 transition-all duration-300
-                    ${isAdding || isSuccess ? "opacity-0" : "opacity-100"}
+                    ${isSuccess ? "opacity-0" : "opacity-100"}
                   `}
                     >
                       <ShoppingCart className="w-5 h-5" />
                       Add to Cart
-                    </div>
-
-                    {/* Button text that changes */}
-                    <div
-                      className={`absolute flex items-center justify-center gap-2 transition-all duration-300
-                    ${isAdding ? "opacity-100" : "opacity-0"}
-                  `}
-                    >
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      Adding...
                     </div>
 
                     <div
