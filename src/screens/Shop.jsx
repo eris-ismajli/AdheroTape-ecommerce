@@ -10,7 +10,6 @@ import ProductsList from "../components/ProductsList";
 
 const Shop = () => {
   const navLinks = [
-    { name: "Home", endpoint: "/" },
     { name: "About", endpoint: "/" },
   ];
   const navButtons = [

@@ -28,3 +28,12 @@ export const getProductImagesQuery = (productId) => {
     );
   });
 };
+
+export const getOneProduct = (id) => {
+  return new Promise((resolve, reject) => {
+    db.query("SELECT * FROM products WHERE id = ?", [id], (err, results) => {
+      if (err) reject(err);
+      else resolve(results);
+    });
+  });
+};

@@ -46,7 +46,7 @@ const Header = ({
         </div>
 
         <div className="flex items-center gap-10">
-          {navLinks.map((link, index) => (
+          {navLinks && navLinks.map((link, index) => (
             <button
               key={index}
               onClick={() => {

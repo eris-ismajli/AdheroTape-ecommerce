@@ -18,6 +18,30 @@
   border-radius: 5px;
 }
 
+/* Smooth thin invisible scrollbar */
+.scrollbar-hide::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-hide::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-hide::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.scrollbar-hide::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* Firefox */
+.scrollbar-hide {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.07) transparent;
+}
+
 .test {
   color: rgb(195, 107, 0);
 }

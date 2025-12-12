@@ -1,13 +1,21 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
-import { ShoppingCart, ShoppingBag, Search, Check, Loader2 } from "lucide-react";
+import {
+  ShoppingCart,
+  ShoppingBag,
+  Search,
+  Check,
+  Loader2,
+} from "lucide-react";
 import FilterDropdown from "./FilterDropdown";
 import axiosInstance from "../utils/axiosInstance";
 
 import { useDispatch } from "react-redux";
 import { addToCart } from "../store/cart/actions";
+import { useNavigate } from "react-router-dom";
 
 const ProductsList = ({ setIsAsideSticky }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [products, setProducts] = useState([]);
   const asideRef = useRef(null);
@@ -24,6 +32,7 @@ const ProductsList = ({ setIsAsideSticky }) => {
     };
 
     fetchProducts();
+
   }, []);
 
   useEffect(() => {
@@ -325,12 +334,17 @@ const ProductsList = ({ setIsAsideSticky }) => {
           </div>
         </aside>
 
+        {filteredProducts.length === 0 && (
+          <h1 className="w-[50vw] text-xl">No results found.</h1>
+        )}
+
         {/* PRODUCT GRID */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-10 flex-1">
           {filteredProducts.map((product, i) => {
             const mainImage = product.images?.[0] ?? "/placeholder-tape.png";
             const isAdding = addingStates[i];
             const isSuccess = successStates[i];
+
             return (
               <div
                 key={product.id ?? i}
@@ -338,7 +352,10 @@ const ProductsList = ({ setIsAsideSticky }) => {
                 className="group min-h-[600px]  shadow-[0_4px_20px_rgba(0,0,0,0.35),inset_0_0_12px_rgba(255,255,255,0.04)]
 bg-gradient-to-b from-black/100 to-black/0  rounded-2xl overflow-hidden transform transition-all duration-300 hover:-translate-y-2"
               >
-                <div className="relative w-full h-64 bg-black flex items-center justify-center overflow-hidden">
+                <div
+                  onClick={() => window.open(`/shop/${product.id}`, "_blank")}
+                  className="relative w-full h-64 bg-black flex items-center justify-center overflow-hidden cursor-pointer"
+                >
                   <img
                     src={mainImage}
                     alt={product.title}
@@ -347,7 +364,10 @@ bg-gradient-to-b from-black/100 to-black/0  rounded-2xl overflow-hidden transfor
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 </div>
 
-                <div className="p-6">
+                <div
+                  onClick={() => window.open(`/shop/${product.id}`, "_blank")}
+                  className="p-6 cursor-pointer"
+                >
                   {product.category && (
                     <p
                       className="text-xs uppercase tracking-wide mb-1"
@@ -416,7 +436,7 @@ bg-gradient-to-b from-black/100 to-black/0  rounded-2xl overflow-hidden transfor
                   >
                     {/* Background shine effect on hover */}
                     {!(isAdding || isSuccess) && (
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
                     )}
 
                     {/* Button content */}

@@ -35,7 +35,6 @@ export default function cartReducer(state = initialState, action) {
       }
 
       saveCart(updatedItems);
-      console.log(initialState.items)
       return { ...state, items: updatedItems };
     }
 
