@@ -7,7 +7,7 @@ const Modal = ({ message, onConfirm, onCancel }) => {
       className="
         fixed inset-0 z-50
         flex items-center justify-center
-        bg-black/50 backdrop-blur-sm
+        bg-black/40 backdrop-blur-sm
         animate-fadeIn
       "
       onClick={onCancel}
@@ -18,14 +18,15 @@ const Modal = ({ message, onConfirm, onCancel }) => {
         className="
           relative p-7 w-[90%] max-w-md rounded-2xl
          shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_0_12px_rgba(255,255,255,0.08)]
-  bg-zinc-900
+  bg-gray-950
           text-white
           animate-scaleIn
         "
       >
-        <p className="text-lg mb-6 text-center">
-          {message}
-        </p>
+        <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl z-0">
+          <div className="absolute w-[400px] h-[400px] bg-blue-500/5 rounded-full blur-3xl" />
+        </div>
+        <p className="text-lg mb-6 text-center">{message}</p>
 
         <div className="flex justify-center gap-4 mt-4">
           <button
@@ -46,9 +47,11 @@ const Modal = ({ message, onConfirm, onCancel }) => {
             onClick={onConfirm}
             className="
     px-4 py-2 rounded-lg
-    bg-blue-500 text-black font-normal
-    hover:bg-blue-400
-    transition-colors duration-200
+    bg-yellow-500 text-black font-normal
+
+    transition-all duration-200 ease-out
+    hover:bg-yellow-400
+    hover:shadow-[0_0_18px_rgba(234,179,8,0.55)]
   "
           >
             Confirm

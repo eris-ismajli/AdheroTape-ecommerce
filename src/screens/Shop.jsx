@@ -9,9 +9,7 @@ import ShopHero from "../components/ShopHero";
 import ProductsList from "../components/ProductsList";
 
 const Shop = () => {
-  const navLinks = [
-    { name: "About", endpoint: "/" },
-  ];
+  const navLinks = [{ name: "About", endpoint: "/" }];
   const navButtons = [
     { name: "Profile", icon: UserRound, endpoint: "/" },
     { name: "Cart", icon: ShoppingCart, endpoint: "/cart" },
@@ -21,7 +19,8 @@ const Shop = () => {
 
   return (
     <div className="relative">
-      <div className="absolute inset-0 bg-gradient-to-br from-[#0B0B0D] via-[#121218] to-[#0B0B0D] z-0" />
+      {/* <div className="absolute inset-0 bg-gradient-to-br from-[#0B0B0D] via-[#121218] to-[#0B0B0D] z-0" /> */}
+      <div className="absolute inset-0 bg-gray-950 z-0" />
 
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
         <div className="absolute -top-40 -left-40 w-[800px] h-[800px] bg-yellow-400/7 rounded-full blur-[120px] animate-pulse" />

@@ -19,21 +19,59 @@ const saveCart = (items) => {
 export default function cartReducer(state = initialState, action) {
   switch (action.type) {
     case ADD_TO_CART: {
-      const { product, quantity } = action.payload;
-      const existing = state.items.find((item) => item.id === product.id);
+      const { product, quantity, chosenColor, chosenWidth, chosenLength } =
+        action.payload;
+
+      function hasIdenticalSpecs(item) {
+        return (
+          item.chosenColor === chosenColor &&
+          item.chosenWidth === chosenWidth &&
+          item.chosenLength === chosenLength
+        );
+      }
+
+      const existingItem = state.items.find((item) => item.id === product.id);
 
       let updatedItems;
 
-      if (existing) {
+      // If there is an existing item with the same id as the item we wanna add
+      // and they have identical specifications then
+      // simply increment the quantity of that product
+      if (existingItem && hasIdenticalSpecs(existingItem)) {
         updatedItems = state.items.map((item) =>
           item.id === product.id
             ? { ...item, quantity: item.quantity + quantity }
             : item
         );
       } else {
-        updatedItems = [...state.items, { ...product, quantity }];
+        // if there is an existing item with the same id but with different specs
+        // assign a unique id to the item were about to add
+
+        // The current problem is assigning a random then the backend doesnt recognize
+        if (existingItem) {
+          const oldId = existingItem.id;
+          console.log(oldId);
+          updatedItems = [
+            ...state.items,
+            {
+              ...product,
+              id: crypto.randomUUID(),
+              oldId,
+              quantity,
+              chosenColor,
+              chosenWidth,
+              chosenLength,
+            },
+          ];
+        } else {
+          updatedItems = [
+            ...state.items,
+            { ...product, quantity, chosenColor, chosenWidth, chosenLength },
+          ];
+        }
       }
 
+      console.log(updatedItems);
       saveCart(updatedItems);
       return { ...state, items: updatedItems };
     }
@@ -46,13 +84,11 @@ export default function cartReducer(state = initialState, action) {
 
       let updatedItems;
 
-      if (existing.quantity === 1) {
-        updatedItems = state.items.filter((item) => item.id !== id);
-      } else {
-        updatedItems = state.items.map((item) =>
-          item.id === id ? { ...item, quantity: item.quantity - 1 } : item
-        );
-      }
+      if (existing.quantity === 1) return;
+
+      updatedItems = state.items.map((item) =>
+        item.id === id ? { ...item, quantity: item.quantity - 1 } : item
+      );
 
       saveCart(updatedItems);
       return { ...state, items: updatedItems };

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
+  ArrowLeft,
+  ArrowRight,
   ChevronDown,
   ChevronUp,
   ShoppingCart,
@@ -56,8 +58,16 @@ const Cart = () => {
   const modalConfirmFunc =
     modalMsg === clearCartMsg ? clearAllItems : removeItem;
 
+  const incrementQuantity = (product) => {
+    const chosenColor = product.chosenColor;
+    const chosenWidth = product.chosenWidth;
+    const chosenLength = product.chosenLength;
+
+    dispatch(addToCart(product, 1, chosenColor, chosenWidth, chosenLength));
+  };
+
   return (
-    <div className="relative bg-gradient-to-b from-zinc-950 via-[#070a17] to-zinc-950 text-white overflow-auto">
+    <div className="relative bg-gradient-to-b from-zinc-950 via-[#050816] to-gray-950 text-white overflow-auto">
       {showModal && (
         <Modal
           message={modalMsg}
@@ -70,7 +80,7 @@ const Cart = () => {
         <div className="absolute top-1/3 -right-40 w-[650px] h-[650px] bg-blue-400/5 rounded-full blur-3xl" />
       </div>
 
-      <div className="max-w-[90vw] mx-auto px-6 flex flex-col h-screen justify-center z-10">
+      <div className="max-w-[95vw] mx-auto px-6 flex flex-col h-screen justify-center z-10">
         {/* HEADER */}
         <div className="flex items-center justify-between gap-4 mb-10">
           <div className="flex items-center gap-3">
@@ -91,10 +101,13 @@ const Cart = () => {
 
           <button
             onClick={() => navigate("/shop")}
-            className="hidden sm:inline-flex border border-yellow-400 text-yellow-300 px-4 py-2 rounded-full text-sm font-medium bg-black/30
-            hover:bg-yellow-400 hover:text-black transition-all duration-300 hover:shadow-[0_0_20px_rgba(250,204,21,0.5)]"
+            className="inline-flex items-center gap-2 text-lg text-zinc-300 hover:text-white transition group"
           >
-            Continue Shopping
+            <span>Continue Shopping</span>
+            <ArrowRight
+              size={18}
+              className="group-hover:-translate-x-0.5 transition-transform"
+            />
           </button>
         </div>
 
@@ -122,8 +135,8 @@ const Cart = () => {
             {/* LEFT: ITEMS LIST */}
             <div
               style={{ borderTop: "1px solid rgba(255, 255, 255, 0.18)" }}
-              className="space-y-4 rounded-3xl shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_0_12px_rgba(255,255,255,0.04)]
-  bg-gradient-to-b from-black/0 to-black/70 p-6 overflow-y-auto h-[70vh] scroll-smooth will-change-scroll scrollbar-hide"
+              className="space-y-4 rounded-3xl shadow-[0_4px_20px_rgba(0,0,0,0.35),inset_0_0_12px_rgba(255,255,255,0.04)]
+  bg-gray-800/5 p-6 overflow-y-auto h-[70vh] scroll-smooth will-change-scroll scrollbar-hide"
             >
               {items.map((item) => {
                 const mainImage = item.images?.[0] ?? "/placeholder-tape.png";
@@ -138,10 +151,13 @@ const Cart = () => {
 
                       <div
                         onClick={() =>
-                          navigate(`/shop/${item.id}`, { replace: true })
+                          navigate(
+                            `/shop/${item.oldId ? item.oldId : item.id}`,
+                            { replace: true }
+                          )
                         }
                         className="
-    cursor-pointer h-36 w-36 rounded-2xl bg-black/60 
+    cursor-pointer h-[13rem] w-[13rem] rounded-2xl bg-black/60 
     border border-white/10 flex items-center justify-center 
     overflow-hidden group
   "
@@ -159,31 +175,66 @@ const Cart = () => {
 
                       {/* TEXT CONTENT */}
                       <div className="flex-1 flex flex-col justify-between">
-                        <div>
-                          {item.category && (
-                            <p className="text-[12px] uppercase tracking-wide text-sky-400/80 mb-1">
-                              {item.category}
-                            </p>
-                          )}
-                          <h2
-                            onClick={() =>
-                              navigate(`/shop/${item.id}`, { replace: true })
-                            }
-                            className="
+                        <div className="flex gap-6">
+                          <div>
+                            {item.category && (
+                              <p className="text-[12px] uppercase tracking-wide text-sky-400/80 mb-1">
+                                {item.category}
+                              </p>
+                            )}
+                            <h2
+                              onClick={() =>
+                                navigate(
+                                  `/shop/${item.oldId ? item.oldId : item.id}`,
+                                  { replace: true }
+                                )
+                              }
+                              className="
     text-xl cursor-pointer font-normal 
     text-white transition-colors duration-300
     hover:text-yellow-400
-    line-clamp-2
   "
-                          >
-                            {item.title}
-                          </h2>
+                            >
+                              {item.title}
+                            </h2>
+                          </div>
+                          {/* CHOSEN SPECS */}
+                          <div className="rounded-2xl w-[70%] p-4  bg-gray-900/30 border border-white/5">
+                            <p className="text-[13px] uppercase tracking-[0.2em] text-blue-300 mb-3">
+                              Chosen Specs
+                            </p>
+                            <dl className="space-y-2 text-sm">
+                              <div className="flex justify-between gap-4">
+                                <dt className="text-zinc-500">Color</dt>
+                                <dd className="text-zinc-200">
+                                  {item.chosenColor ? item.chosenColor : "N/A"}
+                                </dd>
+                              </div>
+
+                              <div className="flex justify-between gap-4">
+                                <dt className="text-zinc-500">Width</dt>
+                                <dd className="text-zinc-200">
+                                  {item.chosenWidth ? item.chosenWidth : "N/A"}
+                                </dd>
+                              </div>
+                              <div className="flex justify-between gap-4">
+                                <dt className="text-zinc-500 whitespace-nowrap">
+                                  Length
+                                </dt>
+                                <dd className="text-zinc-200">
+                                  {item.chosenLength
+                                    ? item.chosenLength
+                                    : "N/A"}
+                                </dd>
+                              </div>
+                            </dl>
+                          </div>
                         </div>
 
                         {/* QTY + PRICE */}
                         <div className="mt-2 flex items-end justify-between gap-4">
                           <div className=" text-gray-400">
-                            <div className="flex gap-1 items-center justify-between mb-2 bg-zinc-900/75 rounded-md">
+                            <div className="flex gap-1 items-center justify-between mb-2 bg-gray-900/75 rounded-md">
                               <button
                                 onClick={() =>
                                   dispatch(removeOneFromCart(item.id))
@@ -199,7 +250,7 @@ const Cart = () => {
                                 </span>
                               </p>
                               <button
-                                onClick={() => dispatch(addToCart(item))}
+                                onClick={() => incrementQuantity(item)}
                                 className="p-1 rounded-full text-xs font-semibol"
                               >
                                 <ChevronUp color="white" size={24} />
@@ -267,7 +318,7 @@ const Cart = () => {
             <div
               style={{ borderTop: "1px solid rgba(255, 255, 255, 0.18)" }}
               className="rounded-3xl shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_0_12px_rgba(255,255,255,0.04)]
-  bg-gradient-to-b from-black/0 to-black/70 p-6 space-y-5 "
+  bg-gray-800/5 p-6 space-y-5 "
             >
               <h3 className="text-xl font-semibold flex items-center gap-2">
                 Order Summary

@@ -151,12 +151,27 @@ const ProductsList = ({ setIsAsideSticky }) => {
   }, [filteredProducts]);
 
   const handleAddToCart = (product, index) => {
-    dispatch(addToCart(product));
+    const { color, sizes = [] } = product;
 
-    // Set success state
+    const colorsArray =
+      typeof color === "string"
+        ? color
+            .split(",")
+            .map((c) => c.trim())
+            .filter(Boolean)
+        : [];
+
+    const uniqueWidths = [...new Set(sizes.map((size) => size.width))];
+    const uniqueLengths = [...new Set(sizes.map((size) => size.length))];
+
+    const defaultColor = colorsArray[0];
+    const defaultWidth = uniqueWidths[0];
+    const defaultLength = uniqueLengths[0];
+
+    dispatch(addToCart(product, 1, defaultColor, defaultWidth, defaultLength));
+
     setSuccessStates((prev) => ({ ...prev, [index]: true }));
 
-    // Reset success state after 2 seconds
     setTimeout(() => {
       setSuccessStates((prev) => ({ ...prev, [index]: false }));
     }, 2000);
@@ -176,24 +191,25 @@ const ProductsList = ({ setIsAsideSticky }) => {
       </div>
 
       {/* Category Filter */}
-      <div className="mt-16 mx-20 flex gap-6 justify-between">
+      <div className="mt-16 mx-8 flex gap-6 justify-between">
         <div className="flex gap-6 max-h-10">
           {categoryFilters.map((filter, index) => (
             <button
               onClick={() => setCategoryFilter(filter.name)}
               key={index}
-              className={`border border-yellow-400 px-4 py-1 rounded-full font-normal 
-           transition-all duration-300 
+              className={`border border-yellow-400/50 px-4 rounded-full font-normal 
+           transition-all duration-300  text-[12px] uppercase tracking-[0.2em] scale-105
            hover:bg-yellow-400 hover:text-black ${
              filter.name === categoryFilter
-               ? "bg-yellow-400 text-black"
-               : "bg-transparent text-white"
+               ? "bg-yellow-500 text-black"
+               : "bg-transparent text-white/70"
            }`}
             >
               {filter.name}
             </button>
           ))}
         </div>
+
         {/* Search Tapes */}
         <div>
           <div className="relative flex items-center max-w-md transition-all duration-300">
@@ -204,10 +220,10 @@ const ProductsList = ({ setIsAsideSticky }) => {
               type="search"
               className="
     w-[15rem]
-    pl-10 pr-4 py-2 font-normal rounded-full border border-gray-500
+    pl-10 pr-4 py-2 font-normal rounded-full border border-gray-500/50 scale-105
     focus:w-[20rem]
-    focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent
-    transition-all duration-300 bg-black/25
+    focus:outline-none focus:border-yellow-400 focus:border-transparent
+    transition-all duration-300 bg-black/25 placeholder-zinc-600
   "
               placeholder="Search Tapes..."
               value={searchQuery}
@@ -218,15 +234,16 @@ const ProductsList = ({ setIsAsideSticky }) => {
       </div>
 
       <h1
-        style={{ borderTop: "1px solid rgba(255, 255, 255, 0.18)" }}
-        className="shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_0_12px_rgba(255,255,255,0.04)]
- lg:block w-72 shrink-0 bg-gradient-to-b from-black/0 to-black/20
- rounded-2xl p-3 px-6 ml-6 mt-6"
+        className="
+ lg:block w-72 shrink-0 bg-transparent
+ rounded-2xl ml-8 mt-6 text-white/60"
       >
-        {categoryFilter.endsWith("Tape")
-          ? `${categoryFilter}s`
-          : `${categoryFilter} Tapes`}
-        : {tapeNumber}
+        {searchQuery.trim() === ""
+          ? categoryFilter.endsWith("Tape")
+            ? `${categoryFilter}s`
+            : `${categoryFilter} Tapes`
+          : "Search Results"}
+        <span className="text-yellow-400/60"> {tapeNumber}</span>
       </h1>
 
       {/* LAYOUT: SIDEBAR + PRODUCT GRID */}
@@ -239,7 +256,7 @@ const ProductsList = ({ setIsAsideSticky }) => {
           ref={asideRef}
           style={{ borderTop: "1px solid rgba(255, 255, 255, 0.18)" }}
           className="hidden shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_0_12px_rgba(255,255,255,0.04)]
- lg:block w-72 shrink-0 bg-gradient-to-b from-black/0 to-black/70
+ lg:block w-72 shrink-0 bg-gradient-to-b from-black/0 to-gray-900/30
  rounded-2xl p-6 h-fit sticky top-2 transition-all duration-300"
         >
           <h3 className="text-xl font-semibold mb-6 text-white">Filters</h3>
@@ -330,7 +347,7 @@ const ProductsList = ({ setIsAsideSticky }) => {
         )}
 
         {/* PRODUCT GRID */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-10 flex-1">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-10 flex-1 items-start">
           {filteredProducts.map((product, i) => {
             const mainImage = product.images?.[0] ?? "/placeholder-tape.png";
             const isSuccess = successStates[i];
@@ -339,8 +356,8 @@ const ProductsList = ({ setIsAsideSticky }) => {
               <div
                 key={product.id ?? i}
                 style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.18)" }}
-                className="group min-h-[600px]  shadow-[0_4px_20px_rgba(0,0,0,0.35),inset_0_0_12px_rgba(255,255,255,0.04)]
-bg-gradient-to-b from-black/100 to-black/0  rounded-2xl overflow-hidden transform transition-all duration-300 hover:-translate-y-2"
+                className="group min-h-[600px] shadow-[0_4px_20px_rgba(0,0,0,0.35),inset_0_0_12px_rgba(255,255,255,0.04)]
+bg-gradient-to-b from-transparent to-gray-900/30  rounded-2xl overflow-hidden transform transition-all duration-300 hover:-translate-y-2"
               >
                 <div
                   onClick={() => navigate(`${product.id}`)}
@@ -355,7 +372,7 @@ bg-gradient-to-b from-black/100 to-black/0  rounded-2xl overflow-hidden transfor
                 </div>
 
                 <div
-                   onClick={() => navigate(`${product.id}`)}
+                  onClick={() => navigate(`${product.id}`)}
                   className="p-6 cursor-pointer"
                 >
                   {product.category && (

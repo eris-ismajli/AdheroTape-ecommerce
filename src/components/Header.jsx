@@ -25,7 +25,7 @@ const Header = ({
     fixed top-2 ${
       isAsideSticky ? "left-[60.7%]" : "left-[50%]"
     } -translate-x-1/2
-    z-40 bg-black/55 backdrop-blur-md rounded-full
+    z-40 bg-gray-950/55 backdrop-blur-md rounded-full
     transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]
     w-[75%] shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_0_12px_rgba(255,255,255,0.06)]
   `}

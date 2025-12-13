@@ -27,6 +27,8 @@ const ProductDetails = () => {
   const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 });
   const [hasAdded, setHasAdded] = useState(false);
   const [quantity, setQuantity] = useState(1);
+
+  // The indexes in the array of details. Default to the first element
   const [selectedColor, setSelectedColor] = useState(0);
   const [selectedWidth, setSelectedWidth] = useState(0);
   const [selectedLength, setSelectedLength] = useState(0);
@@ -117,7 +119,12 @@ const ProductDetails = () => {
   ];
 
   const handleAddToCart = () => {
-    dispatch(addToCart(product, quantity));
+    const chosenColor = colorsArray[selectedColor];
+    const chosenWidth = uniqueWidths[selectedWidth];
+    const chosenLength = uniqueLengths[selectedLength];
+    dispatch(
+      addToCart(product, quantity, chosenColor, chosenWidth, chosenLength)
+    );
     setHasAdded(true);
 
     setTimeout(() => {
@@ -268,7 +275,7 @@ const ProductDetails = () => {
                   </span>
                   <span className="text-xs text-zinc-400">per roll</span>
                 </div>
-                <div className="inline-flex items-center gap-2 mt-4 bg-zinc-900/75 rounded-md px-2">
+                <div className="inline-flex items-center gap-2 mt-4 bg-gray-900/75 rounded-md px-2">
                   <button
                     // onClick={() => dispatch(removeOneFromCart(item.id))}
                     onClick={() => quantity > 1 && setQuantity(quantity - 1)}
