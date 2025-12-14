@@ -222,8 +222,12 @@ function LandingPage() {
   };
 
   return (
-    <main className="bg-gradient-to-br from-[#0B0B0D] via-[#121218] to-[#0B0B0D] ">
-      <div className="bg-gradient-to-br from-[#0B0B0D] via-[#121218] to-[#0B0B0D]  text-white overflow-x-hidden flex flex-col items-center">
+    // <main className="bg-gradient-to-br from-[#0B0B0D] via-[#121218] to-[#0B0B0D] ">
+
+    <main className="bg-gray-950 ">
+      {/* <div className="bg-gradient-to-br from-[#0B0B0D] via-[#121218] to-[#0B0B0D]  text-white overflow-x-hidden flex flex-col items-center"> */}
+
+      <div className="bg-gray-950  text-white overflow-x-hidden flex flex-col items-center">
         {/* HEADER */}
         <Header navLinks={navLinks} showShop={true} />
 
@@ -331,7 +335,7 @@ function LandingPage() {
         {/* OUR PRODUCTS */}
         <motion.section
           id="products"
-          className="py-24 bg-gradient-to-b from-black to-zinc-900"
+          className="py-24 bg-gradient-to-b from-black to-gray-950"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.1 }}
@@ -373,7 +377,7 @@ function LandingPage() {
                   whileHover="hover"
                 >
                   <motion.div
-                    className="relative bg-gradient-to-br from-zinc-800/40 to-zinc-900/30 rounded-2xl overflow-hidden shadow-2xl shadow-black/40 border border-zinc-700/50 hover:border-yellow-500/40 smooth-card gpu-card product-card-inner"
+                    className="relative bg-gradient-to-br from-gray-800/40 to-gray-900/30 rounded-2xl overflow-hidden shadow-2xl shadow-black/40 border border-gray-800/50 hover:border-yellow-500/40 smooth-card gpu-card product-card-inner"
                     variants={cardHover}
                   >
                     {/* Animated border glow */}
@@ -390,7 +394,7 @@ function LandingPage() {
                     </div>
 
                     {/* Content */}
-                    <div className="h-[300px] relative p-6 bg-gradient-to-b from-zinc-900/70 to-zinc-900/50">
+                    <div className="h-[300px] relative p-6 bg-gradient-to-b from-gray-950/70 to-gray-950/50">
                       <h3 className="text-2xl font-bold mb-3 bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-300 bg-clip-text text-transparent group-hover:from-yellow-200 group-hover:via-yellow-300 transition-all duration-300">
                         {product.title}
                       </h3>
@@ -432,7 +436,7 @@ function LandingPage() {
         {/* WHY US */}
         <motion.section
           id="why-us"
-          className="py-24 bg-zinc-900 relative overflow-hidden"
+          className="py-24 bg-gray-950 relative overflow-hidden"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.1 }}
@@ -515,7 +519,7 @@ function LandingPage() {
         {/* WHOLESALE */}
         <motion.section
           id="wholesale"
-          className="py-24 bg-gradient-to-b from-zinc-900 to-black relative"
+          className="py-24 bg-gradient-to-b from-gray-950 to-black relative"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.1 }}

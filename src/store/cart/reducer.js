@@ -9,7 +9,6 @@ const initialState = {
   items: JSON.parse(localStorage.getItem("cart")) || [],
 };
 
-// Save cart to localStorage anytime it changes
 const saveCart = (items) => {
   localStorage.setItem("cart", JSON.stringify(items));
 };

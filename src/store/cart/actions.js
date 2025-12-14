@@ -17,19 +17,16 @@ export const addToCart = (
   payload: { product, quantity, chosenColor, chosenWidth, chosenLength },
 });
 
-// remove one quantity
 export const removeOneFromCart = (id) => ({
   type: REMOVE_ONE_FROM_CART,
   payload: id,
 });
 
-// remove whole product
 export const removeProduct = (id) => ({
   type: REMOVE_PRODUCT,
   payload: id,
 });
 
-// clear entire cart
 export const clearCart = () => ({
   type: CLEAR_CART,
 });

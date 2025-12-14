@@ -103,7 +103,7 @@ const ShopHero = () => {
       className="relative min-h-screen text-white flex items-center overflow-hidden "
     >
 
-      <div className="container mx-auto px-6 py-10 pt-28 lg:px-20 grid lg:grid-cols-2 gap-20 z-10">
+      <div className="mx-auto px-6 py-10 pt-28 lg:px-20 grid lg:grid-cols-2 gap-20 z-10">
         {/* LEFT */}
         <div
           className={`flex flex-col justify-center transition-all duration-1000 ${

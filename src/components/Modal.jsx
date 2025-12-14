@@ -7,20 +7,20 @@ const Modal = ({ message, onConfirm, onCancel }) => {
       className="
         fixed inset-0 z-50
         flex items-center justify-center
-        bg-black/40 backdrop-blur-sm
+        bg-black/40
         animate-fadeIn
       "
       onClick={onCancel}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        style={{ borderTop: "1px solid rgba(255, 255, 255, 0.18)" }}
         className="
           relative p-7 w-[90%] max-w-md rounded-2xl
          shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_0_12px_rgba(255,255,255,0.08)]
   bg-gray-950
           text-white
           animate-scaleIn
+          border-t border-gray-800
         "
       >
         <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl z-0">

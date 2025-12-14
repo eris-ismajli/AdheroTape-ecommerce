@@ -5,6 +5,7 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
+  Heart,
   ShoppingCart,
   Sparkles,
   UserRound,
@@ -12,7 +13,8 @@ import {
 import axiosInstance from "../utils/axiosInstance";
 import Header from "../components/Header";
 import { addToCart } from "../store/cart/actions";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { toggleWishlist } from "../store/wishlist/actions";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -32,6 +34,8 @@ const ProductDetails = () => {
   const [selectedColor, setSelectedColor] = useState(0);
   const [selectedWidth, setSelectedWidth] = useState(0);
   const [selectedLength, setSelectedLength] = useState(0);
+
+  const wishlistItems = useSelector((state) => state.wishlist.items);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -94,6 +98,10 @@ const ProductDetails = () => {
     sku,
   } = product;
 
+  const isWishlisted = wishlistItems.some(
+    (item) => Number(item.id) === Number(product.id)
+  );
+
   const unitPrice = price_raw ? Number(price_raw.replace(/[^0-9.]/g, "")) : 0;
   const totalPrice = unitPrice * quantity;
 
@@ -114,8 +122,9 @@ const ProductDetails = () => {
 
   const navLinks = [{ name: "About", endpoint: "/" }];
   const navButtons = [
-    { name: "Profile", icon: UserRound, endpoint: "/" },
+    { name: "Wishlist", icon: Heart, endpoint: "/wishlist" },
     { name: "Cart", icon: ShoppingCart, endpoint: "/cart" },
+    { name: "Profile", icon: UserRound, endpoint: "/" },
   ];
 
   const handleAddToCart = () => {
@@ -208,6 +217,28 @@ const ProductDetails = () => {
                   transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
                 }}
               />
+
+              <div
+                onClick={(e) => {
+                  e.stopPropagation();
+                  dispatch(toggleWishlist(product));
+                }}
+                className="absolute flex justify-end top-1 right-1 p-3 cursor-pointer w-16 h-16"
+              >
+                <Heart
+                  size={35}
+                  fill={isWishlisted ? "currentColor" : "rgba(0, 0, 0, 0.15)"}
+                  className={`
+                    transition-colors duration-150
+                    drop-shadow-[0_2px_6px_rgba(0,0,0,0.3)]
+                    ${
+                      isWishlisted
+                        ? "text-yellow-300"
+                        : "text-white/70 hover:text-yellow-300"
+                    }
+                  `}
+                />
+              </div>
             </div>
 
             {/* Thumbnails */}
@@ -297,7 +328,7 @@ const ProductDetails = () => {
                 </div>
               </div>
 
-              <div>
+              <div className="flex flex-col items-center">
                 <button
                   onClick={() => handleAddToCart(product)}
                   disabled={hasAdded}
@@ -365,11 +396,45 @@ const ProductDetails = () => {
               </button> */}
             </div>
 
+            <div className="flex gap-6 items-center text-sm">
+              {colorsArray && colorsArray[selectedColor] && (
+                <div className="flex gap-2 bg-gray-900/40 p-4 rounded-xl">
+                  <span className="text-zinc-500 font-light">
+                    SELECTED COLOR
+                  </span>
+                  <span className="text-blue-300">
+                    {colorsArray[selectedColor].toUpperCase()}
+                  </span>
+                </div>
+              )}
+
+              {uniqueWidths && uniqueWidths[selectedWidth] && (
+                <div className="flex gap-2 bg-gray-900/40 p-4 rounded-xl">
+                  <span className="text-zinc-500 font-light">
+                    SELECTED WIDTH
+                  </span>
+                  <span className="text-blue-300">
+                    {uniqueWidths[selectedWidth].toUpperCase()}
+                  </span>
+                </div>
+              )}
+
+              {uniqueLengths && uniqueLengths[selectedLength] && (
+                <div className="flex gap-2 bg-gray-900/40 p-4 rounded-xl">
+                  <span className="text-zinc-500 font-light">
+                    SELECTED LENGTH
+                  </span>
+                  <span className="text-blue-300">
+                    {uniqueLengths[selectedLength].toUpperCase()}
+                  </span>
+                </div>
+              )}
+            </div>
+
             {/* Specs */}
             <div className="grid gap-4 sm:grid-cols-2">
               <div
-                style={{ borderTop: "1px solid rgba(255, 255, 255, 0.18)" }}
-                className="rounded-2xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_0_12px_rgba(255,255,255,0.1)]
+                className="rounded-2xl border-t border-gray-800 p-6 shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_0_12px_rgba(255,255,255,0.06)]
  bg-gradient-to-b from-black/0 to-black/30"
               >
                 <p className="text-[13px] uppercase tracking-[0.2em] text-blue-300 mb-3">
@@ -449,8 +514,7 @@ const ProductDetails = () => {
               </div>
 
               <div
-                style={{ borderTop: "1px solid rgba(255, 255, 255, 0.18)" }}
-                className="rounded-2xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_0_12px_rgba(255,255,255,0.1)]
+                className="rounded-2xl border-t border-gray-800 p-6 shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_0_12px_rgba(255,255,255,0.06)]
  bg-gradient-to-b from-black/0 to-black/30"
               >
                 <p className="flex items-center gap-1 text-[13px] uppercase tracking-[0.2em] text-blue-300 mb-3">

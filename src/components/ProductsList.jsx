@@ -5,13 +5,15 @@ import {
   Search,
   Check,
   Loader2,
+  Heart,
 } from "lucide-react";
 import FilterDropdown from "./FilterDropdown";
 import axiosInstance from "../utils/axiosInstance";
 
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../store/cart/actions";
 import { useNavigate } from "react-router-dom";
+import { toggleWishlist } from "../store/wishlist/actions";
 
 const ProductsList = ({ setIsAsideSticky }) => {
   const dispatch = useDispatch();
@@ -126,8 +128,8 @@ const ProductsList = ({ setIsAsideSticky }) => {
   const [successStates, setSuccessStates] = useState({});
 
   useEffect(() => {
-    const saved = localStorage.getItem("categoryFilter");
-    if (saved) setCategoryFilter(saved);
+    const savedFilters = localStorage.getItem("categoryFilter");
+    if (savedFilters) setCategoryFilter(savedFilters);
   }, []);
 
   useEffect(() => {
@@ -177,11 +179,13 @@ const ProductsList = ({ setIsAsideSticky }) => {
     }, 2000);
   };
 
+  const wishlistItems = useSelector((state) => state.wishlist.items);
+
   return (
     <section className="relative py-32 text-white border-b border-white/5">
       {/* TITLE */}
       <div className="text-center transition-all duration-1000 opacity-100 translate-y-0">
-        <h2 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-yellow-400">
+        <h2 className="text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-yellow-400">
           Find your tape
         </h2>
         <p className="text-gray-400 text-lg mt-4">
@@ -191,14 +195,14 @@ const ProductsList = ({ setIsAsideSticky }) => {
       </div>
 
       {/* Category Filter */}
-      <div className="mt-16 mx-8 flex gap-6 justify-between">
+      <div className="my-16 mx-8 flex gap-8 justify-center">
         <div className="flex gap-6 max-h-10">
           {categoryFilters.map((filter, index) => (
             <button
               onClick={() => setCategoryFilter(filter.name)}
               key={index}
-              className={`border border-yellow-400/50 px-4 rounded-full font-normal 
-           transition-all duration-300  text-[12px] uppercase tracking-[0.2em] scale-105
+              className={`border border-yellow-300/50 px-4 rounded-full
+           transition-all duration-300 text-[12px] uppercase tracking-[0.2em] scale-105
            hover:bg-yellow-400 hover:text-black ${
              filter.name === categoryFilter
                ? "bg-yellow-500 text-black"
@@ -211,7 +215,18 @@ const ProductsList = ({ setIsAsideSticky }) => {
         </div>
 
         {/* Search Tapes */}
-        <div>
+        <div className="flex items-center gap-6">
+          {/* <h1
+            className="
+ text-white/60"
+          >
+            {searchQuery.trim() === ""
+              ? categoryFilter.endsWith("Tape")
+                ? `${categoryFilter}s`
+                : `${categoryFilter} Tapes`
+              : "Search Results"}
+            <span className="text-yellow-400/60"> {tapeNumber}</span>
+          </h1> */}
           <div className="relative flex items-center max-w-md transition-all duration-300">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Search color="gray" size={18} />
@@ -233,7 +248,7 @@ const ProductsList = ({ setIsAsideSticky }) => {
         </div>
       </div>
 
-      <h1
+      {/* <h1
         className="
  lg:block w-72 shrink-0 bg-transparent
  rounded-2xl ml-8 mt-6 text-white/60"
@@ -244,21 +259,19 @@ const ProductsList = ({ setIsAsideSticky }) => {
             : `${categoryFilter} Tapes`
           : "Search Results"}
         <span className="text-yellow-400/60"> {tapeNumber}</span>
-      </h1>
+      </h1> */}
 
       {/* LAYOUT: SIDEBAR + PRODUCT GRID */}
       <div
-        className="container mx-auto mt-5 px-6 flex gap-10 relative"
+        className="mx-auto mt-5 px-6 flex gap-10 relative"
         ref={containerRef}
       >
         {/* FILTER SIDEBAR */}
         <aside
           ref={asideRef}
-          style={{ borderTop: "1px solid rgba(255, 255, 255, 0.18)" }}
-          className="hidden shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_0_12px_rgba(255,255,255,0.04)]
- lg:block w-72 shrink-0 bg-gradient-to-b from-black/0 to-gray-900/30
- rounded-2xl p-6 h-fit sticky top-2 transition-all duration-300"
+          className="w-[300px] p-6 h-fit sticky top-2 transition-all duration-300"
         >
+          <div className="w-[2px] bg-yellow-400/70 rounded-l-full h-full absolute left-0"/>
           <h3 className="text-xl font-semibold mb-6 text-white">Filters</h3>
 
           {/* PRICE FILTER */}
@@ -268,7 +281,7 @@ const ProductsList = ({ setIsAsideSticky }) => {
               type="range"
               min="0"
               max="100"
-              className="w-full accent-blue-500"
+              className="w-full accent-yellow-500"
             />
             <div className="flex justify-between text-xs text-gray-400 mt-2">
               <span>$0</span>
@@ -350,119 +363,170 @@ const ProductsList = ({ setIsAsideSticky }) => {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-10 flex-1 items-start">
           {filteredProducts.map((product, i) => {
             const mainImage = product.images?.[0] ?? "/placeholder-tape.png";
+
             const isSuccess = successStates[i];
+
+            const isWishlisted = wishlistItems.some(
+              (item) => Number(item.id) === Number(product.id)
+            );
 
             return (
               <div
-                key={product.id ?? i}
-                style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.18)" }}
-                className="group min-h-[600px] shadow-[0_4px_20px_rgba(0,0,0,0.35),inset_0_0_12px_rgba(255,255,255,0.04)]
-bg-gradient-to-b from-transparent to-gray-900/30  rounded-2xl overflow-hidden transform transition-all duration-300 hover:-translate-y-2"
+                onClick={() => navigate(`${product.id}`)}
+                className="
+    rounded-2xl
+    overflow-hidden
+    bg-black
+  "
               >
                 <div
-                  onClick={() => navigate(`${product.id}`)}
-                  className="relative w-full h-64 bg-black flex items-center justify-center overflow-hidden cursor-pointer"
+                  className="
+      group
+      relative
+      w-full
+      cursor-pointer
+
+
+      duration-500
+      ease-[cubic-bezier(0.4,0,0.2,1)]
+    "
                 >
+                  {/* IMAGE */}
                   <img
                     src={mainImage}
                     alt={product.title}
-                    className="object-contain transition-transform duration-700 group-hover:scale-105"
+                    className="
+        object-contain
+        duration-700
+        ease-out
+        group-hover:scale-110
+      "
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                </div>
 
-                <div
-                  onClick={() => navigate(`${product.id}`)}
-                  className="p-6 cursor-pointer"
-                >
-                  {product.category && (
-                    <p
-                      className="text-xs uppercase tracking-wide mb-1"
-                      style={{ color: "rgb(1, 160, 242)" }}
-                    >
-                      {product.category}
-                    </p>
-                  )}
+                  {/* VIGNETTE */}
+                  <div
+                    className="
+        pointer-events-none
+        absolute inset-0
+        bg-gradient-to-t
+        from-black/60 via-black/10 to-transparent
+        opacity-0
+        transition-opacity
+        duration-500
+        group-hover:opacity-100
+      "
+                  />
 
-                  <h3
-                    className="text-lg font-semibold text-white transition-colors duration-300
-    hover:text-yellow-400 line-clamp-2"
+                  {/* WISHLIST */}
+                  <div
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      dispatch(toggleWishlist(product));
+                    }}
+                    className="absolute top-3 right-3 z-10"
                   >
-                    {product.title}
-                  </h3>
-
-                  <p className="text-yellow-400 font-bold text-xl mt-3">
-                    {product.price_raw}
-                  </p>
-
-                  {/* ⭐ REVIEW STARS */}
-                  <div className="flex items-center gap-1 mt-2">
-                    {[...Array(5)].map((_, idx) => (
-                      <svg
-                        key={idx}
-                        className="w-4 h-4 text-gray-500 group-hover:text-yellow-300 transition-colors duration-300"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.177c.969 0 1.371 1.24.588 1.81l-3.383 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.538 1.118l-3.383-2.46a1 1 0 00-1.175 0l-3.383 2.46c-.783.57-1.838-.196-1.538-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.048 9.394c-.783-.57-.38-1.81.588-1.81h4.177a1 1 0 00.95-.69l1.286-3.967z" />
-                      </svg>
-                    ))}
-
-                    {/* rating text or number */}
-                    <span className="text-gray-400 text-sm ml-1 group-hover:text-gray-200 transition-colors">
-                      4.8 / 5
-                    </span>
+                    <Heart
+                      size={28}
+                      fill={isWishlisted ? "currentColor" : "rgba(0,0,0,0.15)"}
+                      className={`
+          transition-colors duration-150
+          drop-shadow-[0_2px_6px_rgba(0,0,0,0.3)]
+          ${
+            isWishlisted
+              ? "text-yellow-300"
+              : "text-white/70 hover:text-yellow-300"
+          }
+        `}
+                    />
                   </div>
-                </div>
-                <div className="w-[92%] absolute bottom-4 self-center justify-self-center flex flex-col items-center justify-center gap-3">
-                  <button className="w-full bg-black/15 flex items-center justify-center gap-2 text-yellow-200 border border-zinc-800 hover:text-yellow-200 hover:border-yellow-200 font-semibold py-3 rounded-xl hover:shadow-lg hover:shadow-yellow-400/30 transition-all duration-300">
-                    <ShoppingBag className="w-5 h-5 text-yellow-200" />
-                    Add to Wishlist
-                  </button>
 
-                  {/* Refined Add to Cart Button */}
+                  <div
+                    className="
+        absolute
+        bottom-2
+        left-1/2
+        -translate-x-1/2
+        w-[95%]
+
+        bg-gray-950/70
+        backdrop-blur-[7px]
+        rounded-xl
+        p-5
+
+        duration-500
+        ease-out
+      "
+                  >
+                    {product.category && (
+                      <p className="text-xs uppercase tracking-wide mb-1 absolute top-4 right-4 text-blue-400">
+                        {product.category}
+                      </p>
+                    )}
+
+                    <p
+                      className="
+    text-yellow-400 font-bold text-2xl
+    transition-all duration-300 ease-out mb-3
+    group-hover:text-yellow-200
+    group-hover:drop-shadow-[0_0_14px_rgba(250,204,21,0.85)]
+  "
+                    >
+                      {product.price_raw}
+                    </p>
+
+                    <h3 className="text-lg font-semibold text-white line-clamp-1">
+                      {product.title}
+                    </h3>
+                  </div>
+
                   <button
-                    onClick={() => handleAddToCart(product, i)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAddToCart(product, i);
+                    }}
                     disabled={isSuccess}
                     className={`
-                    w-full flex items-center justify-center gap-2 relative
-                    ${
-                      isSuccess
-                        ? "bg-gradient-to-r from-green-400 to-green-500 animate-success-pulse"
-                        : "bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 hover:to-yellow-400"
-                    }
-                    text-black font-semibold py-3 rounded-xl 
-                    transition-all duration-300 ease-out
-                    ${
-                      !isSuccess &&
-                      "hover:shadow-lg hover:shadow-yellow-400/30 hover:scale-[1.02]"
-                    }
-                    ${isSuccess && "cursor-default"}
-                    overflow-hidden
-                  `}
+    px-6 py-2 flex items-center justify-center gap-1.5 absolute top-2 left-2 shadow-[0_4px_11px_rgba(0,0,0,0.25)]
+
+    ${
+      isSuccess
+        ? "bg-gradient-to-r from-green-400 to-green-500 animate-success-pulse"
+        : "bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 hover:to-yellow-400"
+    }
+    text-black text-sm font-semibold
+ rounded-[10px]
+    transition-all duration-300 ease-out
+    ${
+      !isSuccess &&
+      "hover:shadow-md hover:shadow-yellow-400/25 hover:scale-[1.015]"
+    }
+    ${isSuccess && "cursor-default"}
+    overflow-hidden
+  `}
                   >
-                    {/* Background shine effect on hover */}
+                    {/* Background shine */}
                     {!isSuccess && (
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
                     )}
 
-                    {/* Button content */}
+                    {/* Default */}
                     <div
-                      className={`flex items-center justify-center gap-2 transition-all duration-300
-                    ${isSuccess ? "opacity-0" : "opacity-100"}
-                  `}
+                      className={`flex items-center justify-center gap-1.5 transition-all duration-300
+      ${isSuccess ? "opacity-0" : "opacity-100"}
+    `}
                     >
-                      <ShoppingCart className="w-5 h-5" />
+                      <ShoppingCart className="w-4 h-4" />
                       Add to Cart
                     </div>
 
+                    {/* Success */}
                     <div
-                      className={`absolute flex items-center justify-center gap-2 transition-all duration-300
-                    ${isSuccess ? "opacity-100" : "opacity-0"}
-                  `}
+                      className={`absolute flex items-center justify-center gap-1.5 transition-all duration-300
+      ${isSuccess ? "opacity-100" : "opacity-0"}
+    `}
                     >
-                      <Check className="w-5 h-5" />
-                      Added to Cart!
+                      <Check className="w-4 h-4" />
+                      Added
                     </div>
                   </button>
                 </div>

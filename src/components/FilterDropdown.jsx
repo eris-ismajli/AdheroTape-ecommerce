@@ -6,7 +6,7 @@ const FilterDropdown = ({ label, options, setCategoryFilter }) => {
       <div className="relative">
         <select
           className="
-            w-full bg-black/40 border border-white/10 text-gray-300 
+            w-full bg-gray-950/40 border border-white/10 text-gray-300 
             rounded-xl px-4 py-3 appearance-none cursor-pointer
             focus:outline-none focus:border-blue-400 transition
           "

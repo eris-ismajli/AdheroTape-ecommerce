@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "../index.css";
 
-import { UserRound, ShoppingCart } from "lucide-react";
+import { UserRound, ShoppingCart, Heart } from "lucide-react";
 
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -11,8 +11,9 @@ import ProductsList from "../components/ProductsList";
 const Shop = () => {
   const navLinks = [{ name: "About", endpoint: "/" }];
   const navButtons = [
-    { name: "Profile", icon: UserRound, endpoint: "/" },
+    { name: "Wishlist", icon: Heart, endpoint: "/wishlist" },
     { name: "Cart", icon: ShoppingCart, endpoint: "/cart" },
+    { name: "Profile", icon: UserRound, endpoint: "/" },
   ];
 
   const [isAsideSticky, setIsAsideSticky] = useState(false);

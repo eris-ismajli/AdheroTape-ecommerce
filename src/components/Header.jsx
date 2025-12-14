@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { useSelector } from "react-redux";
 import { selectCartCount } from "../store/cart/selectors";
@@ -7,6 +7,7 @@ import { ShoppingCart } from "lucide-react";
 import logoNoText from "../assets/logo-notext.png";
 import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
+import { selectWishlistCount } from "../store/wishlist/selectors";
 
 const Header = ({
   navLinks,
@@ -18,6 +19,32 @@ const Header = ({
   const navigate = useNavigate();
 
   const cartCount = useSelector(selectCartCount);
+  const wishlistCount = useSelector(selectWishlistCount);
+
+  /* ---------------- SCROLL HIDE / SHOW ---------------- */
+  const [hidden, setHidden] = useState(false);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const currentY = window.scrollY;
+
+      // ignore micro scroll
+      if (Math.abs(currentY - lastScrollY.current) < 8) return;
+
+      if (currentY > lastScrollY.current && currentY > 80) {
+        setHidden(true); // scrolling down
+      } else {
+        setHidden(false); // scrolling up
+      }
+
+      lastScrollY.current = currentY;
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  /* ---------------------------------------------------- */
 
   return (
     <header
@@ -25,11 +52,12 @@ const Header = ({
     fixed top-2 ${
       isAsideSticky ? "left-[60.7%]" : "left-[50%]"
     } -translate-x-1/2
-    z-40 bg-gray-950/55 backdrop-blur-md rounded-full
+    z-40 border-t border-gray-800 bg-gray-950/55 backdrop-blur-md rounded-full
     transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]
-    w-[75%] shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_0_12px_rgba(255,255,255,0.06)]
+    w-[75%]
+    shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_0_12px_rgba(255,255,255,0.06)]
+    ${hidden ? "-translate-y-24 opacity-0" : "translate-y-0 opacity-100"}
   `}
-      style={{ borderTop: "1px solid rgba(255, 255, 255, 0.18)" }}
     >
       <nav
         className="md:flex gap-8 mx-4 my-3"
@@ -44,20 +72,19 @@ const Header = ({
         </div>
 
         <div className="flex items-center gap-10">
-          {navLinks && navLinks.map((link, index) => (
-            <button
-              key={index}
-              onClick={() => {
-                if (link.endpoint.startsWith("#")) {
-                  // SCROLL behavior only for in-page anchors
-                  const el = document.querySelector(link.endpoint);
-                  if (el) el.scrollIntoView({ behavior: "smooth" });
-                } else {
-                  // NORMAL NAVIGATION when endpoint is a route
-                  navigate(link.endpoint);
-                }
-              }}
-              className="
+          {navLinks &&
+            navLinks.map((link, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  if (link.endpoint.startsWith("#")) {
+                    const el = document.querySelector(link.endpoint);
+                    if (el) el.scrollIntoView({ behavior: "smooth" });
+                  } else {
+                    navigate(link.endpoint);
+                  }
+                }}
+                className="
   relative text-white/70 transition-all duration-300 
   hover:text-yellow-300 
   hover:-translate-y-0.5
@@ -67,38 +94,30 @@ const Header = ({
   hover:after:w-full
   hover:after:shadow-[0_0_10px_rgba(255,215,0,0.6)]
 "
-              style={{
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-              }}
-            >
-              {link.name}
-            </button>
-          ))}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                {link.name}
+              </button>
+            ))}
         </div>
 
         <div className="flex items-center gap-7">
-          {/* SEARCH BAR */}
           {showSearch && (
             <div
-              style={{ borderTop: "1px solid rgba(255, 255, 255, 0.18)" }}
               className="
-    relative
-    flex items-center
-    bg-black/30
-   
-    rounded-full
-    px-4 py-2
+    relative flex items-center bg-black/30
+    border-t border-gray-800 rounded-full px-4 py-2
     shadow-[inset_0_0_8px_rgba(255,255,255,0.08)]
     transition-all duration-300
-
     focus-within:border-blue-300
     focus-within:shadow-[0_0_8px_rgba(140,180,255,0.35)]
   "
             >
               <Search color="gray" size={20} />
-
               <input
                 type="text"
                 placeholder="Search..."
@@ -119,31 +138,45 @@ const Header = ({
                 <div className="relative" key={index}>
                   <button
                     onClick={() => navigate(button.endpoint)}
-                    style={{ borderTop: "1px solid rgba(255, 255, 255, 0.18)" }}
                     className="
                 flex items-center gap-2 p-2.5
                 bg-black/30 rounded-full scale-105
                 transition-shadow duration-300 ease-out
-                
+                border-t border-gray-800
                 shadow-[0_0_0_rgba(80,140,255,0),inset_0_0_8px_rgba(255,255,255,0.08)]
                 hover:shadow-[0_0_18px_rgba(80,140,255,0.45),inset_0_0_8px_rgba(255,255,255,0.08)]
                 "
                   >
                     <Icon size={18} color="white" />
                   </button>
+
                   {button.name === "Cart" && cartCount > 0 && (
                     <span
                       className="
         absolute -top-1 -right-1
-        bg-yellow-400 text-black
-        text-xs font-bold
-        rounded-full
-        h-5 min-w-5 px-1
+        bg-yellow-400 text-black text-xs font-bold
+        rounded-full h-5 min-w-5 px-1
         flex items-center justify-center
-        shadow-[0_0_10px_rgba(255,215,0,0.6)] pointer-events-none
+        shadow-[0_0_10px_rgba(255,215,0,0.6)]
+        pointer-events-none
       "
                     >
                       {cartCount}
+                    </span>
+                  )}
+
+                  {button.name === "Wishlist" && wishlistCount > 0 && (
+                    <span
+                      className="
+        absolute -top-1 -right-1
+        bg-yellow-400 text-black text-xs font-bold
+        rounded-full h-5 min-w-5 px-1
+        flex items-center justify-center
+        shadow-[0_0_10px_rgba(255,215,0,0.6)]
+        pointer-events-none
+      "
+                    >
+                      {wishlistCount}
                     </span>
                   )}
                 </div>

@@ -4,6 +4,7 @@ import Shop from "./screens/Shop";
 import Cart from "./screens/Cart";
 import ProductDetails from "./screens/ProductDetails";
 import ScrollToTop from "./utils/scrollToTop";
+import Wishlist from "./screens/Wishlist";
 
 const App = () => {
   return (
@@ -12,10 +13,9 @@ const App = () => {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/shop" element={<Shop />} />
-
         <Route path="/shop/:id" element={<ProductDetails />} />
-
         <Route path="/cart" element={<Cart />} />
+        <Route path="/wishlist" element={<Wishlist />} />
       </Routes>
     </Router>
   );

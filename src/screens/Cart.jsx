@@ -8,6 +8,7 @@ import {
   ShoppingCart,
   Trash,
   Trash2,
+  X,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -65,6 +66,7 @@ const Cart = () => {
 
     dispatch(addToCart(product, 1, chosenColor, chosenWidth, chosenLength));
   };
+  
 
   return (
     <div className="relative bg-gradient-to-b from-zinc-950 via-[#050816] to-gray-950 text-white overflow-auto">
@@ -80,9 +82,9 @@ const Cart = () => {
         <div className="absolute top-1/3 -right-40 w-[650px] h-[650px] bg-blue-400/5 rounded-full blur-3xl" />
       </div>
 
-      <div className="max-w-[95vw] mx-auto px-6 flex flex-col h-screen justify-center z-10">
+      <div className="max-w-[95vw] mx-auto px-6 flex flex-col min-h-screen z-10">
         {/* HEADER */}
-        <div className="flex items-center justify-between gap-4 mb-10">
+        <div className="flex items-center justify-between gap-4 my-10 justify-self-start">
           <div className="flex items-center gap-3">
             <ShoppingCart className="text-yellow-500" size={40} />
             <div>
@@ -113,7 +115,7 @@ const Cart = () => {
 
         {/* EMPTY STATE */}
         {items.length === 0 && (
-          <div className="mt-10 rounded-3xl border border-white/10 bg-gradient-to-br from-white/5 via-white/0 to-yellow-500/5  px-8 py-12 text-center shadow-[0_18px_45px_rgba(0,0,0,0.65)]">
+          <div className="my-auto mx-auto text-center">
             <p className="text-lg text-gray-200 mb-2">
               Your cart is feeling a bit light.
             </p>
@@ -134,8 +136,7 @@ const Cart = () => {
           <div className="grid lg:grid-cols-[2fr,1fr] gap-8">
             {/* LEFT: ITEMS LIST */}
             <div
-              style={{ borderTop: "1px solid rgba(255, 255, 255, 0.18)" }}
-              className="space-y-4 rounded-3xl shadow-[0_4px_20px_rgba(0,0,0,0.35),inset_0_0_12px_rgba(255,255,255,0.04)]
+              className="space-y-4 rounded-3xl border-t border-gray-800 shadow-[0_4px_20px_rgba(0,0,0,0.35),inset_0_0_12px_rgba(255,255,255,0.04)]
   bg-gray-800/5 p-6 overflow-y-auto h-[70vh] scroll-smooth will-change-scroll scrollbar-hide"
             >
               {items.map((item) => {
@@ -259,7 +260,7 @@ const Cart = () => {
 
                             {item.price_raw && (
                               <p className="mt-0.5">
-                                Price:{" "}
+                                Price{" "}
                                 <span className="text-yellow-300 font-medium">
                                   {item.price_raw}
                                 </span>
@@ -268,7 +269,7 @@ const Cart = () => {
                           </div>
 
                           {item.price_raw && (
-                            <div className="text-right flex items-end">
+                            <div className="text-right flex items-center">
                               <p className="text-gray-400 mr-2">Total</p>
                               <p className="font-semibold text-yellow-300 mr-5">
                                 {(() => {
@@ -287,12 +288,10 @@ const Cart = () => {
                                   setIdToDelete(item.id);
                                 }}
                                 className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg font-medium
-             bg-red-500/15 text-red-500 border border-red-500/25
-             hover:bg-red-500/25 hover:text-red-400 hover:border-red-500/40
+text-red-500 hover:text-red-400
              transition-all duration-200"
                               >
-                                <Trash2 size={18} />
-                                Remove
+                                <X />
                               </button>
                             </div>
                           )}
@@ -316,8 +315,7 @@ const Cart = () => {
 
             {/* RIGHT: SUMMARY CARD */}
             <div
-              style={{ borderTop: "1px solid rgba(255, 255, 255, 0.18)" }}
-              className="rounded-3xl shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_0_12px_rgba(255,255,255,0.04)]
+              className="rounded-3xl border-t border-gray-800 shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_0_12px_rgba(255,255,255,0.04)]
   bg-gray-800/5 p-6 space-y-5 "
             >
               <h3 className="text-xl font-semibold flex items-center gap-2">
