@@ -5,6 +5,19 @@
 @tailwind components;
 @tailwind utilities;
 
+
+/* 🔒 Kill Chrome autofill background */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px rgba(24, 24, 27, 0.7) inset !important;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 ::-webkit-scrollbar {
   width: 5px;
 }

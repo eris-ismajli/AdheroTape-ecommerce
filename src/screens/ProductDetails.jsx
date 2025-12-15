@@ -9,17 +9,25 @@ import {
   ShoppingCart,
   Sparkles,
   UserRound,
+  X,
 } from "lucide-react";
 import axiosInstance from "../utils/axiosInstance";
 import Header from "../components/Header";
 import { addToCart } from "../store/cart/actions";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleWishlist } from "../store/wishlist/actions";
+import ReviewModal from "../components/ReviewModal";
+import Stars from "../components/Stars";
+import ProductReviews from "../components/ProductReviews";
+import { fetchReviews, submitReview } from "../store/reviews/actions";
+import toast from "react-hot-toast";
 
 const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const token = localStorage.getItem("token");
 
   const [product, setProduct] = useState(null);
   const [activeImage, setActiveImage] = useState("");
@@ -29,6 +37,19 @@ const ProductDetails = () => {
   const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 });
   const [hasAdded, setHasAdded] = useState(false);
   const [quantity, setQuantity] = useState(1);
+
+  const [ratingStats, setRatingStats] = useState({ average: 0, count: 0 });
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const {
+    items: reviews,
+    loading: reviewsLoading,
+    submitting,
+  } = useSelector((state) => state.reviews);
+  const authUser = useSelector((state) => state.auth.user);
+
+  const hasReviewed = Boolean(
+    authUser && reviews?.some((r) => Number(r.user_id) === Number(authUser.id))
+  );
 
   // The indexes in the array of details. Default to the first element
   const [selectedColor, setSelectedColor] = useState(0);
@@ -60,6 +81,24 @@ const ProductDetails = () => {
 
     fetchProduct();
   }, [id]);
+
+  useEffect(() => {
+    dispatch(fetchReviews(id));
+  }, [id]);
+
+  useEffect(() => {
+    if (!reviews || reviews.length === 0) {
+      setRatingStats({ average: 0, count: 0 });
+      return;
+    }
+
+    const total = reviews.reduce((sum, r) => sum + Number(r.rating), 0);
+
+    setRatingStats({
+      average: total / reviews.length,
+      count: reviews.length,
+    });
+  }, [reviews]);
 
   if (loading) {
     return (
@@ -254,6 +293,65 @@ const ProductDetails = () => {
                   transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
                 }}
               />
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+
+                  if (!authUser) {
+                    navigate("/login");
+                    return;
+                  }
+
+                  if (hasReviewed) {
+                    toast(`Already left a review`, {
+                      icon: <X className="text-red-400" />,
+                    });
+                    return;
+                  }
+
+                  setShowReviewModal(true);
+                }}
+                className={`
+  px-5 py-2.5 rounded-full text-sm
+  absolute bottom-3 left-3
+  transform-gpu transition-all duration-300 ease-out
+
+  ${
+    hasReviewed
+      ? "bg-gray-600 text-gray-300 cursor-not-allowed opacity-70"
+      : "bg-yellow-400 text-black hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(250,204,21,0.3)] hover:bg-yellow-300"
+  }
+
+  active:translate-y-0
+`}
+              >
+                Leave a review
+              </button>
+
+              {ratingStats.count === 0 && !reviewsLoading && (
+                <div className="absolute top-4 left-4 text-xs text-zinc-400">
+                  No reviews yet
+                </div>
+              )}
+
+              {ratingStats.count > 0 && (
+                <div
+                  className="
+      absolute top-3 left-3
+      bg-black/70 
+      border border-white/10
+      rounded-full px-3 py-1
+      shadow-lg
+      flex items-center gap-2
+    "
+                >
+                  <Stars value={ratingStats.average} size={12} />
+                  <span className="text-xs text-zinc-400">
+                    ({ratingStats.count})
+                  </span>
+                </div>
+              )}
 
               <div
                 onClick={(e) => {
@@ -634,7 +732,24 @@ hover:shadow-[0_6px_18px_rgba(0,0,0,0.35)]
             </div>
           </div>
         </div>
+        <ProductReviews reviews={reviews} loading={reviewsLoading} />
       </div>
+      {showReviewModal && (
+        <ReviewModal
+          submitting={submitting}
+          onClose={() => setShowReviewModal(false)}
+          onSubmit={({ rating, comment }) => {
+            dispatch(
+              submitReview({
+                productId: product.id,
+                rating,
+                comment,
+              })
+            );
+            setShowReviewModal(false);
+          }}
+        />
+      )}
     </div>
   );
 };

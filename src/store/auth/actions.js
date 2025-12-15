@@ -4,14 +4,25 @@ import axiosInstance from "../../utils/axiosInstance";
 import { syncWishlistOnLogin } from "../wishlist/actions";
 import { syncCartOnLogin } from "../cart/actions";
 
+import { setAuthToken } from "../../utils/axiosInstance";
+
 export const loginUser = (credentials) => async (dispatch) => {
   const { data } = await axiosInstance.post("/auth/login", credentials);
 
+  console.log("LOGIN RESPONSE", data);
+
+  // 🔑 SET TOKEN FIRST
+  setAuthToken(data.token);
+
   dispatch({
     type: LOGIN_SUCCESS,
-    payload: data.token,
+    payload: {
+      token: data.token,
+      user: data.user,
+    },
   });
 
+  // ✅ NOW these requests are authorized
   await dispatch(syncWishlistOnLogin());
   await dispatch(syncCartOnLogin());
 
@@ -19,20 +30,22 @@ export const loginUser = (credentials) => async (dispatch) => {
 };
 
 export const registerUser = (payload) => async (dispatch) => {
-  try {
-    const { data } = await axiosInstance.post("/auth/register", payload);
+  const { data } = await axiosInstance.post("/auth/register", payload);
 
-    dispatch({
-      type: LOGIN_SUCCESS,
-      payload: data.token,
-    });
+  setAuthToken(data.token);
 
-    return data;
-  } catch (error) {
-    throw error;
-  }
+  dispatch({
+    type: LOGIN_SUCCESS,
+    payload: {
+      token: data.token,
+      user: data.user,
+    },
+  });
+
+  return data;
 };
 
-export const logoutUser = () => ({
-  type: LOGOUT,
-});
+export const logoutUser = () => (dispatch) => {
+  setAuthToken(null);
+  dispatch({ type: LOGOUT });
+};

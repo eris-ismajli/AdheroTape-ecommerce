@@ -11,25 +11,43 @@ const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+
+    if (isSubmitting) return;
+
+    const newErrors = {};
+
+    if (!name.trim()) newErrors.name = "Name is required";
+    if (!email.trim()) newErrors.email = "Email is required";
+    if (!password.trim()) newErrors.password = "Password is required";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setErrors({});
+    setIsSubmitting(true);
 
     try {
-      await dispatch(
-        registerUser({
-          name,
-          email,
-          password,
-        })
-      );
-      console.log({ name, email, password });
-
-      navigate("/shop");
+      await dispatch(registerUser({ name, email, password }));
+      navigate("/verify-email", { state: { email } });
     } catch (err) {
-      setError(err.response?.data?.message || "Registration failed");
+      const message = err.response?.data?.message;
+
+      if (message?.toLowerCase().includes("email")) {
+        setErrors({ email: message });
+      } else if (message?.toLowerCase().includes("password")) {
+        setErrors({ password: message });
+      } else {
+        setErrors({ general: message || "Registration failed" });
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -48,8 +66,35 @@ const Register = () => {
           <p className="text-sm text-gray-400">Join us in a few seconds</p>
         </div>
 
+        {errors.general && (
+          <div
+            className="
+    mb-4 rounded-lg border border-red-500/30
+    bg-red-500/10 text-red-300
+    px-4 py-2 text-sm
+    animate-[fadeIn_0.2s_ease-out]
+  "
+          >
+            {errors.general}
+          </div>
+        )}
+
         {/* Form */}
-        <form className="space-y-5">
+        <form className="space-y-5" autoComplete="off">
+          {/* Chrome autofill trap */}
+          <input
+            type="text"
+            name="username"
+            autoComplete="username"
+            className="hidden"
+          />
+          <input
+            type="password"
+            name="password"
+            autoComplete="current-password"
+            className="hidden"
+          />
+
           {/* Name */}
           <div>
             <label className="block text-xs uppercase tracking-wide text-gray-400 mb-2">
@@ -58,9 +103,23 @@ const Register = () => {
             <input
               type="text"
               placeholder="John Doe"
-              className="w-full rounded-xl bg-zinc-900/70 border border-white/10 px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400/50 transition"
-              onChange={(e) => setName(e.target.value)}
+              className={`
+    w-full rounded-xl bg-zinc-900/70 px-4 py-3 text-sm
+    text-white placeholder-gray-500 transition focus:outline-none
+    ${
+      errors.name
+        ? "border border-red-500/50 focus:ring-2 focus:ring-red-500/40"
+        : "border border-white/10 focus:ring-2 focus:ring-blue-400/50"
+    }
+  `}
+              onChange={(e) => {
+                setName(e.target.value);
+                if (errors.name) setErrors((p) => ({ ...p, name: null }));
+              }}
             />
+            {errors.name && (
+              <p className="mt-1 text-xs text-red-400">{errors.name}</p>
+            )}
           </div>
 
           {/* Email */}
@@ -69,11 +128,26 @@ const Register = () => {
               Email
             </label>
             <input
+              autoComplete="new-email"
               type="email"
               placeholder="you@example.com"
-              className="w-full rounded-xl bg-zinc-900/70 border border-white/10 px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400/60 transition"
-              onChange={(e) => setEmail(e.target.value)}
+              className={`
+    w-full rounded-xl bg-zinc-900/70 px-4 py-3 text-sm
+    text-white placeholder-gray-500 transition focus:outline-none
+    ${
+      errors.email
+        ? "border border-red-500/50 focus:ring-2 focus:ring-red-500/40"
+        : "border border-white/10 focus:ring-2 focus:ring-yellow-400/60"
+    }
+  `}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (errors.email) setErrors((p) => ({ ...p, email: null }));
+              }}
             />
+            {errors.email && (
+              <p className="mt-1 text-xs text-red-400">{errors.email}</p>
+            )}
           </div>
 
           {/* Password */}
@@ -82,19 +156,69 @@ const Register = () => {
               Password
             </label>
             <input
+              autoComplete="new-password"
               type="password"
               placeholder="••••••••"
-              className="w-full rounded-xl bg-zinc-900/70 border border-white/10 px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400/50 transition"
-              onChange={(e) => setPassword(e.target.value)}
+              className={`
+    w-full rounded-xl bg-zinc-900/70 px-4 py-3 text-sm
+    text-white placeholder-gray-500 transition focus:outline-none
+    ${
+      errors.password
+        ? "border border-red-500/50 focus:ring-2 focus:ring-red-500/40"
+        : "border border-white/10 focus:ring-2 focus:ring-blue-400/50"
+    }
+  `}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (errors.password)
+                  setErrors((p) => ({ ...p, password: null }));
+              }}
             />
+            {errors.password && (
+              <p className="mt-1 text-xs text-red-400">{errors.password}</p>
+            )}
           </div>
 
           <button
             type="submit"
-            className="w-full mt-2 rounded-xl py-3 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-semibold transition-all duration-300 hover:from-yellow-300 hover:to-yellow-400 hover:shadow-[0_0_25px_rgba(250,204,21,0.35)] active:scale-[0.98]"
+            disabled={isSubmitting}
+            className={`
+    w-full mt-2 rounded-xl py-3
+    flex items-center justify-center gap-2
+    font-semibold
+    transition-all duration-300 ease-out
+    ${
+      isSubmitting
+        ? "bg-yellow-400/70 cursor-not-allowed"
+        : "bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 hover:to-yellow-400 hover:shadow-[0_0_25px_rgba(250,204,21,0.35)]"
+    }
+    text-black
+    active:scale-[0.98]
+  `}
             onClick={handleSubmit}
           >
-            Register
+            {isSubmitting ? (
+              <>
+                <span className="h-4 w-4 rounded-full border-2 border-black/30 border-t-black animate-spin" />
+                Creating account…
+              </>
+            ) : (
+              "Register"
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate("/shop")}
+            className="
+    w-full mt-3 rounded-xl py-3
+    border border-white/15
+    text-white text-sm font-medium
+    transition-all duration-300
+    hover:bg-white/5 hover:border-white/30
+    active:scale-[0.98]
+  "
+          >
+            Continue to shop
           </button>
         </form>
 

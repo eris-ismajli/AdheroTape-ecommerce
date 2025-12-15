@@ -78,13 +78,17 @@ export const clearCart = async ({ userId }) => {
 export const getCartByUser = async ({ userId }) => {
   const [rows] = await db.query(
     `
-    SELECT
-      c.id AS cart_item_id,
-      c.quantity,
-      c.chosen_color,
-      c.chosen_width,
-      c.chosen_length,
-      p.*
+SELECT
+  c.id AS cart_item_id,
+  c.product_id,
+  c.quantity,
+  c.chosen_color,
+  c.chosen_width,
+  c.chosen_length,
+  c.created_at,
+  p.*
+
+
     FROM user_cart_items c
     JOIN products p ON p.id = c.product_id
     WHERE c.user_id = ?
@@ -95,7 +99,7 @@ export const getCartByUser = async ({ userId }) => {
 
   if (!rows.length) return [];
 
-  const productIds = rows.map((r) => r.id);
+  const productIds = rows.map((r) => r.product_id);
 
   const [images] = await db.query(
     `
@@ -120,6 +124,7 @@ export const getCartByUser = async ({ userId }) => {
     chosenColor: row.chosen_color,
     chosenWidth: row.chosen_width,
     chosenLength: row.chosen_length,
+    created_at: row.created_at,
 
     // product fields
     id: row.id,

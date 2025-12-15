@@ -17,15 +17,11 @@ const Modal = ({ message, onConfirm, onCancel }) => {
         className="
           relative p-7 w-[90%] max-w-md rounded-2xl
          shadow-[0_4px_20px_rgba(0,0,0,0.45)]
-  bg-gray-950
           text-white
           animate-scaleIn
-          border border-gray-800/40
+          bg-zinc-950 border border-white/10
         "
       >
-        <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl z-0">
-          <div className="absolute w-[400px] h-[400px] bg-blue-500/5 rounded-full blur-3xl" />
-        </div>
         <p className="text-lg mb-6 text-center">{message}</p>
 
         <div className="flex justify-center gap-4 mt-4">

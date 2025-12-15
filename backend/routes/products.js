@@ -14,10 +14,11 @@ router.get("/", async (req, res) => {
       colors: req.query.colors ? req.query.colors.split(",") : [],
       widths: req.query.widths ? req.query.widths.split(",") : [],
       lengths: req.query.lengths ? req.query.lengths.split(",") : [],
+      maxPrice: req.query.maxPrice ? Number(req.query.maxPrice) : undefined,
     };
 
     const page = Number(req.query.page) || 1;
-    const limit = 12; 
+    const limit = 12;
 
     const result = await getAllProducts(filters, page, limit);
     res.json(result);

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { loginUser } from "../store/auth/actions";
 import { useNavigate } from "react-router-dom";
@@ -12,6 +12,10 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    setError("");
+  }, [email, password]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -20,7 +24,13 @@ const Login = () => {
       await dispatch(loginUser({ email, password }));
       navigate("/shop"); // or navigate("/") or close modal
     } catch (err) {
-      setError("Invalid email or password");
+      const msg = err.response?.data?.message;
+
+      if (msg?.toLowerCase().includes("verify")) {
+        setError("Please verify your email before logging in");
+      } else {
+        setError("Invalid email or password");
+      }
     }
   };
 
@@ -35,7 +45,7 @@ const Login = () => {
         {/* Header */}
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-semibold text-white mb-2">
-            Welcome back
+            AdheroTape
           </h1>
           <p className="text-sm text-gray-400">Log in to continue</p>
         </div>
@@ -78,6 +88,21 @@ const Login = () => {
             />
           </div>
 
+          {error && (
+            <div
+              className="
+      rounded-lg border border-red-500/30
+      bg-red-500/10 text-red-300
+      px-4 py-2 text-sm
+      flex items-center gap-2
+      animate-[fadeIn_0.2s_ease-out]
+    "
+            >
+              <span className="font-medium">Login failed.</span>
+              <span className="text-red-400">{error}</span>
+            </div>
+          )}
+
           {/* Login button */}
           <button
             type="submit"
@@ -93,6 +118,21 @@ const Login = () => {
             onClick={handleSubmit}
           >
             Log In
+          </button>
+
+          <button
+            type="button"
+            onClick={() => navigate("/shop")}
+            className="
+    w-full mt-3 rounded-xl py-3
+    border border-white/15
+    text-white text-sm font-medium
+    transition-all duration-300
+    hover:bg-white/5 hover:border-white/30
+    active:scale-[0.98]
+  "
+          >
+            Continue to shop
           </button>
         </form>
 

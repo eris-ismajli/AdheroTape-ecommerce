@@ -67,6 +67,21 @@ const ProductsList = () => {
   const [products, setProducts] = useState([]);
   const [tapeNumber, setTapeNumber] = useState(0);
 
+  const maxPriceFromUrl = Number(searchParams.get("maxPrice") ?? 100);
+  const [priceRange, setPriceRange] = useState(maxPriceFromUrl);
+
+  useEffect(() => {
+    setPriceRange(maxPriceFromUrl);
+  }, [maxPriceFromUrl]);
+
+  useEffect(() => {
+    return () => {
+      if (priceDebounceRef.current) {
+        clearTimeout(priceDebounceRef.current);
+      }
+    };
+  }, []);
+
   const requestIdRef = useRef(0);
 
   useEffect(() => {
@@ -78,6 +93,7 @@ const ProductsList = () => {
         const params = {
           category: category !== "All Tapes" ? category : undefined,
           search: search || undefined,
+          maxPrice: maxPriceFromUrl < 100 ? maxPriceFromUrl : undefined,
           page,
           limit: ITEMS_PER_PAGE,
         };
@@ -101,15 +117,30 @@ const ProductsList = () => {
     fetchProducts();
 
     return () => controller.abort();
-  }, [category, search, page]);
+  }, [category, search, page, maxPriceFromUrl]);
 
   const changeCategory = useCallback(
     (cat) => {
-      // keep behavior: setting new params drops existing ones (like search)
-      setSearchParams({ category: cat, page: "1" });
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+
+        next.set("category", cat);
+        next.set("page", "1"); // reset page on category change
+
+        return next;
+      });
     },
     [setSearchParams]
   );
+
+  const clearAllFilters = useCallback(() => {
+    setSearchParams({
+      category: "All Tapes",
+      page: "1",
+    });
+
+    setShowSidebar(false); // optional but recommended
+  }, [setSearchParams]);
 
   const goToPage = useCallback(
     (p) => {
@@ -129,6 +160,7 @@ const ProductsList = () => {
 
   const [searchDraft, setSearchDraft] = useState(search);
   const debounceRef = useRef(null);
+  const priceDebounceRef = useRef(null);
 
   // keep input synced if URL changes (back/forward, manual URL edits, etc.)
   useEffect(() => {
@@ -274,8 +306,9 @@ const ProductsList = () => {
   const headerTitle = useMemo(() => {
     if (search) return "Search Results";
     if (category.endsWith("Tape")) return `${category}s`;
+
     if (category === "All Tapes") return "All Tapes";
-    return "Tapes";
+    return `${category} Tapes`;
   }, [category, search]);
 
   return (
@@ -360,7 +393,7 @@ const ProductsList = () => {
         <div
           className={`
     fixed inset-0 z-50
-    backdrop-blur-sm bg-black/40
+ bg-black/40
     transition-opacity duration-300
     ${showSidebar ? "opacity-100" : "opacity-0 pointer-events-none"}
   `}
@@ -379,7 +412,24 @@ const ProductsList = () => {
           >
             {" "}
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold text-yellow-500">FILTERS</h3>
+              <div className="flex items-center gap-4">
+                <h3 className="text-xl font-semibold text-yellow-500">
+                  FILTERS
+                </h3>
+                <button
+                  onClick={clearAllFilters}
+                  className="
+      text-xs uppercase tracking-widest
+      px-3 py-1.5 rounded-full
+      border border-red-500/30
+      text-red-400
+      hover:bg-red-500 hover:text-white
+      transition-all duration-200
+    "
+                >
+                  Clear all
+                </button>
+              </div>
               <button onClick={() => setShowSidebar(false)}>
                 <X />
               </button>
@@ -519,18 +569,87 @@ const ProductsList = () => {
 "
               >
                 {" "}
-                Price Range
+                Max Price
               </p>
 
               <input
                 type="range"
-                min="0"
-                max="100"
+                min={0}
+                max={1500}
+                step={5}
+                value={priceRange}
+                onChange={(e) => setPriceRange(Number(e.target.value))}
+                onMouseUp={() => {
+                  setSearchParams((prev) => {
+                    const next = new URLSearchParams(prev);
+                    next.set("maxPrice", priceRange);
+                    next.set("page", "1");
+                    return next;
+                  });
+                }}
                 className="w-full accent-yellow-500"
               />
-              <div className="flex justify-between text-xs text-gray-400 mt-2">
+              <div className="flex justify-between items-center text-xs text-gray-400 mt-2">
                 <span>$0</span>
-                <span>$100</span>
+
+                <div className="flex items-center gap-1">
+                  <span className="text-lg">$</span>
+
+                  <input
+                    type="text"
+                    min={0}
+                    max={1500}
+                    step={5}
+                    value={priceRange}
+                    onChange={(e) => {
+                      const value = Number(e.target.value);
+                      if (Number.isNaN(value)) return;
+
+                      const clamped = Math.min(Math.max(value, 0), 1500);
+                      setPriceRange(clamped);
+
+                      if (priceDebounceRef.current) {
+                        clearTimeout(priceDebounceRef.current);
+                      }
+
+                      priceDebounceRef.current = setTimeout(() => {
+                        setSearchParams((prev) => {
+                          const next = new URLSearchParams(prev);
+                          next.set("maxPrice", clamped);
+                          next.set("page", "1");
+                          return next;
+                        });
+                      }, 300);
+                    }}
+                    className="
+        w-14 text-right
+        bg-transparent
+        text-yellow-400 font-medium
+        border-b border-white/20
+        focus:outline-none focus:border-yellow-400
+        transition text-lg mr-2
+      "
+                  />
+
+                  {/* Custom steppers */}
+                  <div className="flex flex-col -ml-1">
+                    <button
+                      type="button"
+                      onClick={() => setPriceRange((p) => Math.min(p + 5, 300))}
+                      className="text-white/40 hover:text-yellow-400 transition"
+                    >
+                      <ChevronUp size={14} />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setPriceRange((p) => Math.max(p - 5, 0))}
+                      className="text-white/40 hover:text-yellow-400 transition"
+                    >
+                      <ChevronDown size={14} />
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
             {/* COLOR FILTER */}

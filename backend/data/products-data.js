@@ -19,6 +19,11 @@ export const getFilteredProductsCountQuery = async (filters = {}) => {
     values.push(`%${filters.search}%`);
   }
 
+  if (typeof filters.maxPrice === "number") {
+    sql += " AND p.price <= ?";
+    values.push(filters.maxPrice);
+  }
+
   const [rows] = await db.query(sql, values);
   return rows[0].total;
 };
@@ -63,6 +68,11 @@ export const getFilteredProductsQuery = async (
   if (Array.isArray(filters.lengths) && filters.lengths.length) {
     sql += ` AND ps.length IN (${filters.lengths.map(() => "?").join(",")})`;
     values.push(...filters.lengths);
+  }
+
+  if (typeof filters.maxPrice === "number") {
+    sql += " AND p.price <= ?";
+    values.push(filters.maxPrice);
   }
 
   sql += " LIMIT ? OFFSET ?";

@@ -20,6 +20,7 @@ import {
 } from "../store/cart/actions";
 import Modal from "../components/Modal";
 import { incrementCartItem } from "../store/cart/actions";
+import toast from "react-hot-toast";
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -47,11 +48,14 @@ const Cart = () => {
       dispatch(removeProduct(itemToDelete.clientItemId));
     }
 
+    toast(`Product removed`, {
+      icon: <Trash2 className="text-red-400" />,
+    });
+
     setItemToDelete(null);
   };
 
   const items = useSelector((state) => state.cart.items || []);
-  console.log(items);
 
   const totalItems = items.reduce((sum, item) => sum + (item.quantity || 0), 0);
 
@@ -144,6 +148,7 @@ const Cart = () => {
             >
               {items.map((item) => {
                 const mainImage = item.images?.[0] ?? "/placeholder-tape.png";
+                const productId = item.productId ?? item.id;
 
                 return (
                   <div
@@ -154,13 +159,7 @@ const Cart = () => {
                       {/* IMAGE */}
 
                       <div
-                        onClick={() =>
-                          navigate(
-                            `/shop/${
-                              isAuthenticated ? item.id : item.productId
-                            }`
-                          )
-                        }
+                        onClick={() => navigate(`/shop/${productId}`)}
                         className="
     cursor-pointer h-[13rem] w-[13rem] rounded-2xl bg-black/60 
     border border-white/10 flex items-center justify-center 
@@ -188,13 +187,7 @@ const Cart = () => {
                               </p>
                             )}
                             <h2
-                              onClick={() =>
-                                navigate(
-                                  `/shop/${
-                                    isAuthenticated ? item.id : item.productId
-                                  }`
-                                )
-                              }
+                              onClick={() => navigate(`/shop/${productId}`)}
                               className="
     text-xl cursor-pointer font-normal 
     text-white transition-colors duration-300

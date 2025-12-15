@@ -82,7 +82,7 @@ const Header = ({
         className="md:flex gap-8 mx-4 my-3"
         style={{ alignItems: "center", justifyContent: "space-between" }}
       >
-        <div className="flex items-center gap-2">
+        <div onClick={() => navigate("/shop")} className="flex items-center gap-2 cursor-pointer">
           <img src={logoNoText} className="w-10" alt="AdheroTape logo" />
           <h1 className="text-2xl font-bold">
             <span className="text-yellow-400">Adhero</span>
@@ -174,7 +174,7 @@ const Header = ({
                         <div
                           className="
       absolute left-1/2 -translate-x-1/2 mt-3 w-44
-      rounded-xl bg-gray-950/95 backdrop-blur-md
+      rounded-xl bg-gray-950 backdrop-blur-md
       border border-gray-700/30
       shadow-[0_10px_30px_rgba(0,0,0,0.6)]
       overflow-hidden
