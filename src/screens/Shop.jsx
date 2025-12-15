@@ -13,7 +13,7 @@ const Shop = () => {
   const navButtons = [
     { name: "Wishlist", icon: Heart, endpoint: "/wishlist" },
     { name: "Cart", icon: ShoppingCart, endpoint: "/cart" },
-    { name: "Profile", icon: UserRound, endpoint: "/" },
+    { name: "Profile", icon: UserRound, endpoint: "/login" },
   ];
 
   const [isAsideSticky, setIsAsideSticky] = useState(false);
@@ -24,15 +24,12 @@ const Shop = () => {
       <div className="absolute inset-0 bg-gray-950 z-0" />
 
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
-        <div className="absolute -top-40 -left-40 w-[800px] h-[800px] bg-yellow-400/7 rounded-full blur-[120px] animate-pulse" />
         <div className="absolute scale-110 top-96 -right-40 w-[700px] h-[700px] bg-blue-400/5 rounded-full blur-[120px] animate-pulse delay-1000" />
-        <div className="absolute top-1/3 -right-20 w-[600px] h-[600px] bg-purple-400/10 rounded-full blur-[100px] animate-pulse delay-300" />
-        <div className="absolute bottom-1/3 -left-20 w-[600px] h-[600px] bg-cyan-400/5 rounded-full blur-[100px] animate-pulse delay-500" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-gradient-to-r from-yellow-400/25 via-transparent to-blue-400/8 rounded-full blur-[150px] opacity-40" />
+        <div className="absolute scale-110 top-[800px] -left-40 w-[700px] h-[700px] bg-blue-400/5 rounded-full blur-[120px] animate-pulse delay-1000" />
       </div>
 
       {/* CONTENT */}
-      <div className="relative z-20 flex flex-col items-center justify-center ">
+      <div className="relative z-20 flex flex-col items-center justify-center">
         <Header
           navLinks={navLinks}
           navButtons={navButtons}

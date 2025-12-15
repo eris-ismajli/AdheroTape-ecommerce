@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { selectCartCount } from "../store/cart/selectors";
 import { ShoppingCart } from "lucide-react";
 
@@ -9,6 +9,8 @@ import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
 import { selectWishlistCount } from "../store/wishlist/selectors";
 
+import { logoutUser } from "../store/auth/actions";
+
 const Header = ({
   navLinks,
   navButtons,
@@ -16,10 +18,27 @@ const Header = ({
   showSearch = false,
   isAsideSticky,
 }) => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const cartCount = useSelector(selectCartCount);
   const wishlistCount = useSelector(selectWishlistCount);
+
+  const isAuthenticated = useSelector((state) => state.auth?.isAuthenticated);
+
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (profileRef.current && !profileRef.current.contains(e.target)) {
+        setProfileOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   /* ---------------- SCROLL HIDE / SHOW ---------------- */
   const [hidden, setHidden] = useState(false);
@@ -52,10 +71,10 @@ const Header = ({
     fixed top-2 ${
       isAsideSticky ? "left-[60.7%]" : "left-[50%]"
     } -translate-x-1/2
-    z-40 border-t border-gray-800 bg-gray-950/55 backdrop-blur-md rounded-full
+    z-40 border border-gray-700/25 bg-gray-950/80 backdrop-blur-md rounded-full
     transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]
     w-[75%]
-    shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_0_12px_rgba(255,255,255,0.06)]
+    shadow-[0_4px_20px_rgba(0,0,0,0.45)]
     ${hidden ? "-translate-y-24 opacity-0" : "translate-y-0 opacity-100"}
   `}
     >
@@ -110,8 +129,7 @@ const Header = ({
             <div
               className="
     relative flex items-center bg-black/30
-    border-t border-gray-800 rounded-full px-4 py-2
-    shadow-[inset_0_0_8px_rgba(255,255,255,0.08)]
+    border border-gray-700/25 rounded-full px-4 py-2
     transition-all duration-300
     focus-within:border-blue-300
     focus-within:shadow-[0_0_8px_rgba(140,180,255,0.35)]
@@ -136,28 +154,90 @@ const Header = ({
               const Icon = button.icon;
               return (
                 <div className="relative" key={index}>
-                  <button
-                    onClick={() => navigate(button.endpoint)}
-                    className="
-                flex items-center gap-2 p-2.5
-                bg-black/30 rounded-full scale-105
-                transition-shadow duration-300 ease-out
-                border-t border-gray-800
-                shadow-[0_0_0_rgba(80,140,255,0),inset_0_0_8px_rgba(255,255,255,0.08)]
-                hover:shadow-[0_0_18px_rgba(80,140,255,0.45),inset_0_0_8px_rgba(255,255,255,0.08)]
-                "
-                  >
-                    <Icon size={18} color="white" />
-                  </button>
+                  {button.name === "Profile" && isAuthenticated ? (
+                    <div ref={profileRef} className="relative">
+                      <button
+                        onClick={() => setProfileOpen((p) => !p)}
+                        className="
+        flex items-center gap-2 p-2.5
+        bg-black/30 rounded-full scale-105
+        transition-shadow duration-300 ease-out
+        border border-gray-700/25
+        hover:shadow-[0_0_18px_rgba(80,140,255,0.45)]
+      "
+                      >
+                        <Icon size={18} color="white" />
+                      </button>
+
+                      {/* DROPDOWN */}
+                      {profileOpen && (
+                        <div
+                          className="
+      absolute left-1/2 -translate-x-1/2 mt-3 w-44
+      rounded-xl bg-gray-950/95 backdrop-blur-md
+      border border-gray-700/30
+      shadow-[0_10px_30px_rgba(0,0,0,0.6)]
+      overflow-hidden
+      z-50
+    "
+                        >
+                          <button
+                            onClick={() => {
+                              navigate("/profile");
+                              setProfileOpen(false);
+                            }}
+                            className="
+            w-full text-left px-4 py-3 text-sm text-white/80
+            hover:bg-white/5 hover:text-yellow-300
+            transition
+          "
+                          >
+                            View profile
+                          </button>
+
+                          <div className="h-px bg-white/10" />
+
+                          <button
+                            onClick={() => {
+                              dispatch(logoutUser());
+                              setProfileOpen(false);
+                              navigate("/shop");
+                            }}
+                            className="
+            w-full text-left px-4 py-3 text-sm
+            text-red-400 hover:bg-red-500/10
+            transition
+          "
+                          >
+                            Log out
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    // fallback: normal behavior for other buttons
+                    <button
+                      onClick={() => navigate(button.endpoint)}
+                      className="
+      flex items-center gap-2 p-2.5
+      bg-black/30 rounded-full scale-105
+      transition-shadow duration-300 ease-out
+      border border-gray-700/25
+      hover:shadow-[0_0_18px_rgba(80,140,255,0.45)]
+    "
+                    >
+                      <Icon size={18} color="white" />
+                    </button>
+                  )}
 
                   {button.name === "Cart" && cartCount > 0 && (
                     <span
                       className="
         absolute -top-1 -right-1
-        bg-yellow-400 text-black text-xs font-bold
+        bg-red-600 text-white text-xs font-bold
         rounded-full h-5 min-w-5 px-1
         flex items-center justify-center
-        shadow-[0_0_10px_rgba(255,215,0,0.6)]
+        shadow-[0_0_10px_rgba(255,0,0,0.6)]
         pointer-events-none
       "
                     >
@@ -169,10 +249,10 @@ const Header = ({
                     <span
                       className="
         absolute -top-1 -right-1
-        bg-yellow-400 text-black text-xs font-bold
+        bg-red-600 text-white text-xs font-bold
         rounded-full h-5 min-w-5 px-1
         flex items-center justify-center
-        shadow-[0_0_10px_rgba(255,215,0,0.6)]
+        shadow-[0_0_10px_rgba(255,0,0,0.6)]
         pointer-events-none
       "
                     >

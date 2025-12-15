@@ -1,30 +1,63 @@
 import {
-  getAllProductsQuery,
+  getFilteredProductsQuery,
+  getFilteredProductsCountQuery,
+  getAllProductSizes,
+  getAllProductImages,
+  getSingleProductQuery,
   getProductSizesQuery,
   getProductImagesQuery,
 } from "../data/products-data.js";
 
-export const getAllProducts = async () => {
-  const products = await getAllProductsQuery();
+export const getAllProducts = async (filters, page, limit) => {
+  const [products, total] = await Promise.all([
+    getFilteredProductsQuery(filters, page, limit),
+    getFilteredProductsCountQuery(filters),
+  ]);
 
-  for (const p of products) {
-    const sizes = await getProductSizesQuery(p.id);
-    const images = await getProductImagesQuery(p.id);
+  const productIds = products.map((p) => p.id);
 
-    p.sizes = sizes;
-    p.images = images.map((i) => i.image_url);
-  }
+  const [sizes, images] = await Promise.all([
+    getAllProductSizes(productIds),
+    getAllProductImages(productIds),
+  ]);
 
-  return products;
+  const sizesMap = {};
+  sizes.forEach((s) => {
+    if (!sizesMap[s.product_id]) sizesMap[s.product_id] = [];
+    sizesMap[s.product_id].push({ width: s.width, length: s.length });
+  });
+
+  const imagesMap = {};
+  images.forEach((i) => {
+    if (!imagesMap[i.product_id]) imagesMap[i.product_id] = [];
+    imagesMap[i.product_id].push(i.image_url);
+  });
+
+  return {
+    data: products.map((p) => ({
+      ...p,
+      sizes: sizesMap[p.id] || [],
+      images: imagesMap[p.id] || [],
+    })),
+    total,
+  };
 };
 
+/**
+ * SINGLE PRODUCT
+ */
 export const getSingleProduct = async (id) => {
-  const products = await getAllProductsQuery();
-  const product = products.find((p) => p.id == id);
+  const product = await getSingleProductQuery(id);
   if (!product) return null;
 
-  product.sizes = await getProductSizesQuery(product.id);
-  product.images = (await getProductImagesQuery(product.id)).map((i) => i.image_url);
+  const [sizes, images] = await Promise.all([
+    getProductSizesQuery(id),
+    getProductImagesQuery(id),
+  ]);
 
-  return product;
+  return {
+    ...product,
+    sizes,
+    images: images.map((i) => i.image_url),
+  };
 };

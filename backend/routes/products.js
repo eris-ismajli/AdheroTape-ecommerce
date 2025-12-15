@@ -1,25 +1,41 @@
 import express from "express";
-import { getAllProducts, getSingleProduct } from "../services/products-service.js";
+import {
+  getAllProducts,
+  getSingleProduct,
+} from "../services/products-service.js";
 
 const router = express.Router();
 
 router.get("/", async (req, res) => {
   try {
-    const data = await getAllProducts();
-    res.json(data);
+    const filters = {
+      category: req.query.category,
+      search: req.query.search,
+      colors: req.query.colors ? req.query.colors.split(",") : [],
+      widths: req.query.widths ? req.query.widths.split(",") : [],
+      lengths: req.query.lengths ? req.query.lengths.split(",") : [],
+    };
+
+    const page = Number(req.query.page) || 1;
+    const limit = 12; 
+
+    const result = await getAllProducts(filters, page, limit);
+    res.json(result);
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: "Server error loading products" });
+    console.error("GET /shop error:", err);
+    res.status(500).json({ error: "Failed to load products" });
   }
 });
 
 router.get("/:id", async (req, res) => {
   try {
-    const data = await getSingleProduct(req.params.id);
-    if (!data) return res.status(404).json({ error: "Product not found" });
-    res.json(data);
+    const product = await getSingleProduct(req.params.id);
+    if (!product) return res.status(404).json({ error: "Product not found" });
+
+    res.json(product);
   } catch (err) {
-    res.status(500).json({ error: "Server error" });
+    console.error("GET /shop/:id error:", err);
+    res.status(500).json({ error: "Failed to load product" });
   }
 });
 

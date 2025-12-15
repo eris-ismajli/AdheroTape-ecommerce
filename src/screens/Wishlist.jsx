@@ -18,9 +18,8 @@ const Wishlist = () => {
 
   const navLinks = [{ name: "About", endpoint: "/" }];
   const navButtons = [
-    { name: "Wishlist", icon: Heart, endpoint: "/wishlist" },
     { name: "Cart", icon: ShoppingCart, endpoint: "/cart" },
-    { name: "Profile", icon: UserRound, endpoint: "/" },
+    { name: "Profile", icon: UserRound, endpoint: "/login" },
   ];
 
   return (

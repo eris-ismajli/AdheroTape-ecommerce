@@ -3,6 +3,8 @@ import {
   REMOVE_ONE_FROM_CART,
   REMOVE_PRODUCT,
   CLEAR_CART,
+  REPLACE_CART,
+  INCREMENT_CART_ITEM,
 } from "./constants";
 
 const initialState = {
@@ -13,80 +15,82 @@ const saveCart = (items) => {
   localStorage.setItem("cart", JSON.stringify(items));
 };
 
-// localStorage.removeItem("cart")
-
 export default function cartReducer(state = initialState, action) {
   switch (action.type) {
+    case REPLACE_CART: {
+      const normalized = action.payload.map((item) => ({
+        ...item,
+        cartItemId: item.cartItemId ?? item.id, // DB ID
+        clientItemId: item.cartItemId ?? item.id, // 👈 reuse DB ID here
+        productId: item.productId ?? item.product_id,
+        chosenColor: item.chosenColor ?? item.chosen_color,
+        chosenWidth: item.chosenWidth ?? item.chosen_width,
+        chosenLength: item.chosenLength ?? item.chosen_length,
+      }));
+
+      // 🔥 THIS WAS MISSING
+      saveCart(normalized);
+
+      return { ...state, items: normalized };
+    }
+
+    // 👇 ALL BELOW IS GUEST-ONLY (unchanged)
+
     case ADD_TO_CART: {
       const { product, quantity, chosenColor, chosenWidth, chosenLength } =
         action.payload;
 
-      function hasIdenticalSpecs(item) {
-        return (
+      const existingItem = state.items.find(
+        (item) =>
+          item.id === product.id &&
           item.chosenColor === chosenColor &&
           item.chosenWidth === chosenWidth &&
           item.chosenLength === chosenLength
-        );
-      }
-
-      const existingItem = state.items.find((item) => item.id === product.id);
+      );
 
       let updatedItems;
 
-      // If there is an existing item with the same id as the item we wanna add
-      // and they have identical specifications then
-      // simply increment the quantity of that product
-      if (existingItem && hasIdenticalSpecs(existingItem)) {
+      if (existingItem) {
         updatedItems = state.items.map((item) =>
-          item.id === product.id
+          item === existingItem
             ? { ...item, quantity: item.quantity + quantity }
             : item
         );
       } else {
-        // if there is an existing item with the same id but with different specs
-        // assign a unique id to the item were about to add
-
-        // The current problem is assigning a random then the backend doesnt recognize
-        if (existingItem) {
-          const oldId = existingItem.id;
-          console.log(oldId);
-          updatedItems = [
-            ...state.items,
-            {
-              ...product,
-              id: crypto.randomUUID(),
-              oldId,
-              quantity,
-              chosenColor,
-              chosenWidth,
-              chosenLength,
-            },
-          ];
-        } else {
-          updatedItems = [
-            ...state.items,
-            { ...product, quantity, chosenColor, chosenWidth, chosenLength },
-          ];
-        }
+        updatedItems = [
+          ...state.items,
+          {
+            clientItemId: crypto.randomUUID(), // 👈 guest-only id
+            productId: product.id, // 👈 ALWAYS THIS
+            title: product.title,
+            price_raw: product.price_raw,
+            images: product.images,
+            category: product.category,
+            quantity,
+            chosenColor,
+            chosenWidth,
+            chosenLength,
+          },
+        ];
       }
 
-      console.log(updatedItems);
       saveCart(updatedItems);
       return { ...state, items: updatedItems };
     }
 
     case REMOVE_ONE_FROM_CART: {
       const id = action.payload;
-      const existing = state.items.find((item) => item.id === id);
 
-      if (!existing) return state;
+      const existing = state.items.find(
+        (item) => item.cartItemId === id || item.id === id
+      );
 
-      let updatedItems;
+      if (!existing || existing.quantity === 1) return state;
 
-      if (existing.quantity === 1) return;
-
-      updatedItems = state.items.map((item) =>
-        item.id === id ? { ...item, quantity: item.quantity - 1 } : item
+      const updatedItems = state.items.map((item) =>
+        item.cartItemId === id || item.id === id
+          ? { ...item, quantity: item.quantity - 1 }
+          : item
       );
 
       saveCart(updatedItems);
@@ -94,9 +98,25 @@ export default function cartReducer(state = initialState, action) {
     }
 
     case REMOVE_PRODUCT: {
+      const id = action.payload;
+
       const updatedItems = state.items.filter(
-        (item) => item.id !== action.payload
+        (item) => item.cartItemId !== id && item.clientItemId !== id
       );
+
+      saveCart(updatedItems);
+      return { ...state, items: updatedItems };
+    }
+
+    case INCREMENT_CART_ITEM: {
+      const id = action.payload;
+
+      const updatedItems = state.items.map((item) =>
+        item.clientItemId === id
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      );
+
       saveCart(updatedItems);
       return { ...state, items: updatedItems };
     }

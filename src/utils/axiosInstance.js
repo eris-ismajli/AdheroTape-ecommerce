@@ -1,16 +1,18 @@
 import axios from "axios";
+import { store } from "../store/store";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:4000", // change for production later
-  withCredentials: false, // true only if you use cookies/sessions
+  baseURL: "http://localhost:4000",
+  withCredentials: false,
 });
 
-// Optional: request & response interceptors
 axiosInstance.interceptors.request.use(
   (config) => {
-    // Example: attach token
-    // const token = localStorage.getItem("token");
-    // if (token) config.headers.Authorization = `Bearer ${token}`;
+    const token = store.getState().auth?.token;
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
 
     return config;
   },

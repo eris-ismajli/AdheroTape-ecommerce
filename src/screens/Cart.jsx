@@ -19,6 +19,7 @@ import {
   addToCart,
 } from "../store/cart/actions";
 import Modal from "../components/Modal";
+import { incrementCartItem } from "../store/cart/actions";
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -26,20 +27,31 @@ const Cart = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [modalMsg, setModalMsg] = useState("");
-  const [idToDelete, setIdToDelete] = useState(null);
+  const [itemToDelete, setItemToDelete] = useState({});
 
   const clearAllItems = () => {
     setShowModal(false);
     dispatch(clearCart());
   };
 
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+
   const removeItem = () => {
+    if (!itemToDelete) return;
+
     setShowModal(false);
-    dispatch(removeProduct(idToDelete));
-    setIdToDelete(null);
+
+    if (isAuthenticated) {
+      dispatch(removeProduct(itemToDelete.cartItemId));
+    } else {
+      dispatch(removeProduct(itemToDelete.clientItemId));
+    }
+
+    setItemToDelete(null);
   };
 
   const items = useSelector((state) => state.cart.items || []);
+  console.log(items);
 
   const totalItems = items.reduce((sum, item) => sum + (item.quantity || 0), 0);
 
@@ -59,17 +71,8 @@ const Cart = () => {
   const modalConfirmFunc =
     modalMsg === clearCartMsg ? clearAllItems : removeItem;
 
-  const incrementQuantity = (product) => {
-    const chosenColor = product.chosenColor;
-    const chosenWidth = product.chosenWidth;
-    const chosenLength = product.chosenLength;
-
-    dispatch(addToCart(product, 1, chosenColor, chosenWidth, chosenLength));
-  };
-  
-
   return (
-    <div className="relative bg-gradient-to-b from-zinc-950 via-[#050816] to-gray-950 text-white overflow-auto">
+    <div className="relative bg-gray-950 text-white overflow-auto">
       {showModal && (
         <Modal
           message={modalMsg}
@@ -136,15 +139,15 @@ const Cart = () => {
           <div className="grid lg:grid-cols-[2fr,1fr] gap-8">
             {/* LEFT: ITEMS LIST */}
             <div
-              className="space-y-4 rounded-3xl border-t border-gray-800 shadow-[0_4px_20px_rgba(0,0,0,0.35),inset_0_0_12px_rgba(255,255,255,0.04)]
-  bg-gray-800/5 p-6 overflow-y-auto h-[70vh] scroll-smooth will-change-scroll scrollbar-hide"
+              className="space-y-4 rounded-3xl border border-gray-800/70 shadow-[0_4px_20px_rgba(0,0,0,0.35)]
+  bg-black/15 p-6 overflow-y-auto h-[70vh] scroll-smooth will-change-scroll scrollbar-hide"
             >
               {items.map((item) => {
                 const mainImage = item.images?.[0] ?? "/placeholder-tape.png";
 
                 return (
                   <div
-                    key={item.id}
+                    key={item.clientItemId}
                     className="pb-6 border-b border-white/10 last:border-b-0 last:pb-0"
                   >
                     <div className="flex gap-4 md:gap-5">
@@ -153,8 +156,9 @@ const Cart = () => {
                       <div
                         onClick={() =>
                           navigate(
-                            `/shop/${item.oldId ? item.oldId : item.id}`,
-                            { replace: true }
+                            `/shop/${
+                              isAuthenticated ? item.id : item.productId
+                            }`
                           )
                         }
                         className="
@@ -186,8 +190,9 @@ const Cart = () => {
                             <h2
                               onClick={() =>
                                 navigate(
-                                  `/shop/${item.oldId ? item.oldId : item.id}`,
-                                  { replace: true }
+                                  `/shop/${
+                                    isAuthenticated ? item.id : item.productId
+                                  }`
                                 )
                               }
                               className="
@@ -238,7 +243,7 @@ const Cart = () => {
                             <div className="flex gap-1 items-center justify-between mb-2 bg-gray-900/75 rounded-md">
                               <button
                                 onClick={() =>
-                                  dispatch(removeOneFromCart(item.id))
+                                  dispatch(removeOneFromCart(item.clientItemId))
                                 }
                                 className="p-1 rounded-full text-xs font-semibold"
                               >
@@ -251,7 +256,9 @@ const Cart = () => {
                                 </span>
                               </p>
                               <button
-                                onClick={() => incrementQuantity(item)}
+                                onClick={() =>
+                                  dispatch(incrementCartItem(item.clientItemId))
+                                }
                                 className="p-1 rounded-full text-xs font-semibol"
                               >
                                 <ChevronUp color="white" size={24} />
@@ -284,8 +291,8 @@ const Cart = () => {
                               <button
                                 onClick={() => {
                                   setModalMsg(removeItemMsg);
+                                  setItemToDelete(item); // ✅ STORE FULL ITEM
                                   setShowModal(true);
-                                  setIdToDelete(item.id);
                                 }}
                                 className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg font-medium
 text-red-500 hover:text-red-400
@@ -302,7 +309,7 @@ text-red-500 hover:text-red-400
                     {/* ACTION BUTTONS — FIXED & WORKING */}
                     {/* <div className="mt-4 flex items-center gap-3">
                       <button
-                        onClick={() => dispatch(removeProduct(item.id))}
+                        onClick={() => dispatch(removeProduct(item.clientItemId))}
                         className="px-3 py-1 rounded-full text-xs font-semibold bg-red-500/20 text-red-400 border border-red-400/30 hover:bg-red-500/30 hover:text-red-300 transition-all duration-200"
                       >
                         Remove Item
@@ -315,8 +322,8 @@ text-red-500 hover:text-red-400
 
             {/* RIGHT: SUMMARY CARD */}
             <div
-              className="rounded-3xl border-t border-gray-800 shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_0_12px_rgba(255,255,255,0.04)]
-  bg-gray-800/5 p-6 space-y-5 "
+              className="rounded-3xl border border-gray-800/70 shadow-[0_4px_20px_rgba(0,0,0,0.45),]
+  bg-black/15 p-6 space-y-5 "
             >
               <h3 className="text-xl font-semibold flex items-center gap-2">
                 Order Summary

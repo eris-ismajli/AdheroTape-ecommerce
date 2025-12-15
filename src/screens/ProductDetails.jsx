@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -34,6 +34,8 @@ const ProductDetails = () => {
   const [selectedColor, setSelectedColor] = useState(0);
   const [selectedWidth, setSelectedWidth] = useState(0);
   const [selectedLength, setSelectedLength] = useState(0);
+
+  const confettiRef = useRef(null);
 
   const wishlistItems = useSelector((state) => state.wishlist.items);
 
@@ -124,21 +126,26 @@ const ProductDetails = () => {
   const navButtons = [
     { name: "Wishlist", icon: Heart, endpoint: "/wishlist" },
     { name: "Cart", icon: ShoppingCart, endpoint: "/cart" },
-    { name: "Profile", icon: UserRound, endpoint: "/" },
+    { name: "Profile", icon: UserRound, endpoint: "/login" },
   ];
 
   const handleAddToCart = () => {
-    const chosenColor = colorsArray[selectedColor];
-    const chosenWidth = uniqueWidths[selectedWidth];
-    const chosenLength = uniqueLengths[selectedLength];
-    dispatch(
-      addToCart(product, quantity, chosenColor, chosenWidth, chosenLength)
-    );
-    setHasAdded(true);
+    const chosenColor = colorsArray[selectedColor] || null;
+    const chosenWidth = uniqueWidths[selectedWidth] || null;
+    const chosenLength = uniqueLengths[selectedLength] || null;
 
-    setTimeout(() => {
-      setHasAdded(false);
-    }, 2000);
+    dispatch(
+      addToCart({
+        product,
+        quantity,
+        chosenColor,
+        chosenWidth,
+        chosenLength,
+      })
+    );
+
+    setHasAdded(true);
+    setTimeout(() => setHasAdded(false), 2000);
   };
 
   const colorMap = {
@@ -155,6 +162,36 @@ const ProductDetails = () => {
     teal: "#14b8a6",
     white: "#ffffff",
     yellow: "#eab308",
+  };
+
+  const fireConfetti = () => {
+    if (!confettiRef.current) return;
+
+    const colors = ["#facc15", "#fde68a", "#ffffff"];
+    const count = 18;
+
+    for (let i = 0; i < count; i++) {
+      const particle = document.createElement("span");
+
+      const angle = Math.random() * Math.PI * 2;
+      const distance = 70 + Math.random() * 50; // 🔥 wider spread
+
+      const x = Math.cos(angle) * distance;
+      const y = Math.sin(angle) * distance - 20; // slight upward bias
+
+      particle.className = "confetti-particle";
+      particle.style.setProperty("--x", `${x}px`);
+      particle.style.setProperty("--y", `${y}px`);
+      particle.style.setProperty("--r", `${Math.random() * 360}deg`);
+      particle.style.backgroundColor =
+        colors[Math.floor(Math.random() * colors.length)];
+
+      confettiRef.current.appendChild(particle);
+
+      setTimeout(() => {
+        particle.remove();
+      }, 1400);
+    }
   };
 
   return (
@@ -296,17 +333,19 @@ const ProductDetails = () => {
 
             {/* Price + CTA */}
             <div className="flex items-center justify-between gap-4">
-              <div>
-                <div className="text-[11px] uppercase tracking-[0.25em] text-zinc-500 mb-1">
-                  From
+              <div className="flex items-end gap-6">
+                <div className="flex flex-col">
+                  <div className="text-[11px] uppercase tracking-[0.25em] text-zinc-500 mb-1">
+                    From
+                  </div>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-4xl font-semibold text-yellow-300">
+                      {price_raw || "$—"}
+                    </span>
+                    <span className="text-xs text-zinc-400">per roll</span>
+                  </div>
                 </div>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-semibold text-yellow-300">
-                    {price_raw || "$—"}
-                  </span>
-                  <span className="text-xs text-zinc-400">per roll</span>
-                </div>
-                <div className="inline-flex items-center gap-2 mt-4 bg-gray-900/75 rounded-md px-2">
+                <div className="inline-flex items-center gap-2 bg-gray-900/75 rounded-md px-2">
                   <button
                     // onClick={() => dispatch(removeOneFromCart(item.id))}
                     onClick={() => quantity > 1 && setQuantity(quantity - 1)}
@@ -329,76 +368,72 @@ const ProductDetails = () => {
               </div>
 
               <div className="flex flex-col items-center">
-                <button
-                  onClick={() => handleAddToCart(product)}
-                  disabled={hasAdded}
-                  className={`
-    flex items-center justify-center gap-2 relative
-
-    ${
-      hasAdded
-        ? "bg-gradient-to-r from-green-400 to-green-500 animate-success-pulse"
-        : "bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 hover:to-yellow-400"
-    }
-
-    text-black font-semibold py-3 px-8 rounded-full
-    transition-all duration-300 ease-out
-    ${
-      hasAdded
-        ? "shadow-[0_0_22px_rgba(34,197,94,0.55)] hover:shadow-[0_0_34px_rgba(34,197,94,0.7)]"
-        : "shadow-[0_0_20px_rgba(250,204,21,0.55)] hover:shadow-[0_0_30px_rgba(250,204,21,0.75)] hover:scale-[1.02]"
-    }
-    ${hasAdded && "cursor-default"}
-    overflow-hidden
-  `}
-                >
-                  {/* Background shine effect on hover */}
-                  {!hasAdded && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-                  )}
-
-                  {/* Button content */}
-                  <div
-                    className={`flex items-center justify-center gap-2 transition-all duration-300
-                    ${hasAdded ? "opacity-0" : "opacity-100"}
-                  `}
-                  >
-                    <ShoppingCart className="w-5 h-5" />
-                    Add to Cart
-                  </div>
-                  <div
-                    className={`absolute flex items-center justify-center gap-2 transition-all duration-300 
-                    ${hasAdded ? "opacity-100" : "opacity-0"}
-                  `}
-                  >
-                    <Check className="w-5 h-5" />
-                    Added to Cart!
-                  </div>
-                </button>
-                <p className="mt-4 ml-2 text-lg">
-                  Total{" "}
+                <p className="mb-3 text-lg">
+                  <span className="text-gray-300">Total </span>
                   <span className="text-yellow-300 font-semibold">
                     ${totalPrice.toFixed(2)}
                   </span>
                 </p>
-              </div>
+                <div className="relative inline-block">
+                  {/* CONFETTI LAYER */}
+                  <div
+                    ref={confettiRef}
+                    className="pointer-events-none absolute inset-0 -z-10"
+                  />
 
-              {/* <button
-                className="group inline-flex items-center gap-2 px-5 py-3 rounded-full text-sm font-medium bg-yellow-400 text-black shadow-[0_0_20px_rgba(250,204,21,0.5)] hover:shadow-[0_0_30px_rgba(250,204,21,0.5)] transition-transform duration-200 hover:-translate-y-0.5"
-                // TODO: wire to your Redux addToCart if needed
-                onClick={() => {
-                  dispatch(addToCart(product));
-                  console.log("Add to cart:", product.id);
-                }}
-              >
-                <ShoppingCart size={16} />
-                <span>Add to cart</span>
-              </button> */}
+                  {/* BUTTON */}
+                  <button
+                    onClick={() => {
+                      handleAddToCart();
+                      fireConfetti();
+                    }}
+                    disabled={hasAdded}
+                    className={`
+      relative z-10
+      flex items-center justify-center gap-2
+      mb-6
+      ${
+        hasAdded
+          ? "bg-gradient-to-r from-green-400 to-green-500 animate-success-pulse"
+          : "bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 hover:to-yellow-400"
+      }
+      text-black font-semibold py-3.5 px-10 rounded-full
+      transition-all duration-300 ease-out
+      ${
+        hasAdded
+          ? "shadow-[0_0_22px_rgba(34,197,94,0.55)]"
+          : "shadow-[0_0_20px_rgba(250,204,21,0.4)] hover:shadow-[0_0_30px_rgba(250,204,21,0.55)] hover:scale-[1.02]"
+      }
+    `}
+                  >
+                    {/* Button content */}
+                    <div
+                      className={`flex items-center justify-center gap-2 transition-all duration-300
+                    ${hasAdded ? "opacity-0" : "opacity-100"}
+                  `}
+                    >
+                      <ShoppingCart className="w-5 h-5" />
+                      Add to Cart
+                    </div>
+                    <div
+                      className={`absolute flex items-center justify-center gap-2 transition-all duration-300 
+                    ${hasAdded ? "opacity-100" : "opacity-0"}
+                  `}
+                    >
+                      <Check className="w-5 h-5" />
+                      Added to Cart!
+                    </div>
+                  </button>
+                </div>
+              </div>
             </div>
 
-            <div className="flex gap-6 items-center text-sm">
+            <div
+              style={{ margin: "0" }}
+              className="flex gap-6 items-center text-sm"
+            >
               {colorsArray && colorsArray[selectedColor] && (
-                <div className="flex gap-2 bg-gray-900/40 p-4 rounded-xl">
+                <div className="flex gap-2 bg-gray-900/40 p-4 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.1)]">
                   <span className="text-zinc-500 font-light">
                     SELECTED COLOR
                   </span>
@@ -409,7 +444,7 @@ const ProductDetails = () => {
               )}
 
               {uniqueWidths && uniqueWidths[selectedWidth] && (
-                <div className="flex gap-2 bg-gray-900/40 p-4 rounded-xl">
+                <div className="flex gap-2 bg-gray-900/40 p-4 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.1)]">
                   <span className="text-zinc-500 font-light">
                     SELECTED WIDTH
                   </span>
@@ -420,7 +455,7 @@ const ProductDetails = () => {
               )}
 
               {uniqueLengths && uniqueLengths[selectedLength] && (
-                <div className="flex gap-2 bg-gray-900/40 p-4 rounded-xl">
+                <div className="flex gap-2 bg-gray-900/40 p-4 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.1)]">
                   <span className="text-zinc-500 font-light">
                     SELECTED LENGTH
                   </span>
@@ -434,8 +469,13 @@ const ProductDetails = () => {
             {/* Specs */}
             <div className="grid gap-4 sm:grid-cols-2">
               <div
-                className="rounded-2xl border-t border-gray-800 p-6 shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_0_12px_rgba(255,255,255,0.06)]
- bg-gradient-to-b from-black/0 to-black/30"
+                className="
+    rounded-2xl
+    border border-white/5
+    bg-gray-950/60
+    p-6
+    shadow-[0_10px_30px_rgba(0,0,0,0.3)]
+  "
               >
                 <p className="text-[13px] uppercase tracking-[0.2em] text-blue-300 mb-3">
                   Technical Specs
@@ -514,8 +554,13 @@ const ProductDetails = () => {
               </div>
 
               <div
-                className="rounded-2xl border-t border-gray-800 p-6 shadow-[0_4px_20px_rgba(0,0,0,0.45),inset_0_0_12px_rgba(255,255,255,0.06)]
- bg-gradient-to-b from-black/0 to-black/30"
+                className="
+    rounded-2xl
+    border border-white/5
+    bg-gray-950/60
+    p-6
+    shadow-[0_10px_30px_rgba(0,0,0,0.3)]
+  "
               >
                 <p className="flex items-center gap-1 text-[13px] uppercase tracking-[0.2em] text-blue-300 mb-3">
                   <Sparkles size={13} />

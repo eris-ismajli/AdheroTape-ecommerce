@@ -1,13 +1,13 @@
 import db from "../config/db.js";
 
 class DealerData {
-  save(form) {
-    return new Promise((resolve, reject) => {
-      db.query("INSERT INTO dealer_applications SET ?", form, (err, result) => {
-        if (err) return reject(err);
-        resolve(result.insertId);
-      });
-    });
+  async save(form) {
+    const [result] = await db.query(
+      "INSERT INTO dealer_applications SET ?",
+      form
+    );
+
+    return result.insertId;
   }
 }
 
