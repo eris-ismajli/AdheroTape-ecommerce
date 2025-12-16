@@ -1,18 +1,17 @@
 import jwt from "jsonwebtoken";
+
 const JWT_SECRET = process.env.JWT_SECRET;
 
 export default function requireAuth(req, res, next) {
-  const header = req.headers.authorization;
+  const accessToken = req.cookies.accessToken;
 
-  if (!header || !header.startsWith("Bearer ")) {
+  if (!accessToken) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
-  const token = header.split(" ")[1];
-
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded;
+    const decoded = jwt.verify(accessToken, JWT_SECRET);
+    req.user = decoded; // { id }
     next();
   } catch {
     return res.status(401).json({ message: "Invalid token" });

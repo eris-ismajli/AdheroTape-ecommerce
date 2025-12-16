@@ -17,12 +17,17 @@ import { fetchWishlist } from "./store/wishlist/actions";
 import { setAuthToken } from "./utils/axiosInstance";
 import { LogOut, UserRoundCheck } from "lucide-react";
 import VerifyEmail from "./screens/VerifyEmail";
+import { fetchCurrentUser } from "./store/auth/actions";
 
 const App = () => {
   const dispatch = useDispatch();
   const { token, isAuthenticated, user } = useSelector((s) => s.auth);
 
   const hasMounted = useRef(false);
+
+  useEffect(() => {
+    dispatch(fetchCurrentUser());
+  }, []);
 
   // 🔑 1. Keep axios in sync with token
   useEffect(() => {

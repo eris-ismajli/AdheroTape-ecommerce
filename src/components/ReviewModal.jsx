@@ -1,7 +1,7 @@
 import { X } from "lucide-react";
 import { useState } from "react";
 
-const ReviewModal = ({ onClose, onSubmit, submitting }) => {
+const ReviewModal = ({ onClose, onSubmit, submitting, message }) => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
 
@@ -16,7 +16,7 @@ const ReviewModal = ({ onClose, onSubmit, submitting }) => {
         </button>
 
         <h3 className="text-lg font-semibold text-white mb-4">
-          Leave a review
+          {message}
         </h3>
 
         {/* Stars */}

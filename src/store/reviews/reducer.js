@@ -5,6 +5,9 @@ import {
   REVIEW_SUBMIT_REQUEST,
   REVIEW_SUBMIT_SUCCESS,
   REVIEW_SUBMIT_FAIL,
+  REVIEW_DELETE_REQUEST,
+  REVIEW_DELETE_SUCCESS,
+  REVIEW_DELETE_FAIL,
 } from "./constants";
 
 const initialState = {
@@ -57,6 +60,13 @@ export default function reviewsReducer(state = initialState, action) {
         submitting: false,
         error: action.payload,
       };
+
+    case REVIEW_DELETE_REQUEST:
+      return { ...state, loading: true };
+    case REVIEW_DELETE_SUCCESS:
+      return { ...state, loading: false, items: action.payload };
+    case REVIEW_DELETE_FAIL:
+      return { ...state, loading: false, error: action.payload };
 
     default:
       return state;

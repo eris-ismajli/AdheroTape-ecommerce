@@ -24,8 +24,10 @@ export const syncCart = async ({ userId, items }) => {
   return await getCartByUser({ userId });
 };
 
+// cart-service.js
 export const getCart = async ({ userId }) => {
-  return await getCartByUser({ userId });
+  const cart = await getCartByUser({ userId });
+  return Array.isArray(cart) ? cart : [];
 };
 
 export const addToCart = async (userId, payload) => {

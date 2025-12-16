@@ -6,7 +6,7 @@ const Stars = ({ value, size = 14 }) => {
       {[1, 2, 3, 4, 5].map((i) => (
         <span
           key={i}
-          className={i <= Math.round(value) ? "text-yellow-400" : "text-zinc-700"}
+          className={i <= Math.round(value) ? "text-yellow-400" : "text-zinc-400"}
           style={{ fontSize: size }}
         >
           ★

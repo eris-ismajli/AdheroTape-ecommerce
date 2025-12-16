@@ -80,6 +80,8 @@ export const syncCartOnLogin = () => async (dispatch) => {
 
   const { data } = await axiosInstance.post("/user/cart/sync", payload);
 
+  console.log("SYNCING CART ON LOGIN:", data)
+
   dispatch({
     type: REPLACE_CART,
     payload: data.items,

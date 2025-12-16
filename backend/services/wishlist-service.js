@@ -33,8 +33,10 @@ export const syncWishlist = async ({ userId, body }) => {
   return products;
 };
 
+// wishlist-service.js
 export const getWishlist = async ({ userId }) => {
-  return await getWishlistProductsByUser({ userId });
+  const wishlist = await getWishlistProductsByUser({ userId });
+  return Array.isArray(wishlist) ? wishlist : [];
 };
 
 export const toggleWishlist = async ({ userId, productId }) => {

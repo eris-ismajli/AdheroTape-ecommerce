@@ -732,7 +732,7 @@ hover:shadow-[0_6px_18px_rgba(0,0,0,0.35)]
             </div>
           </div>
         </div>
-        <ProductReviews reviews={reviews} loading={reviewsLoading} />
+        <ProductReviews reviews={reviews} loading={reviewsLoading} productId={product.id} />
       </div>
       {showReviewModal && (
         <ReviewModal
@@ -748,6 +748,7 @@ hover:shadow-[0_6px_18px_rgba(0,0,0,0.35)]
             );
             setShowReviewModal(false);
           }}
+          message={"Leave a review"}
         />
       )}
     </div>

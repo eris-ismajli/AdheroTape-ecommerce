@@ -69,4 +69,29 @@ router.delete("/:productId", requireAuth, async (req, res) => {
   }
 });
 
+/**
+ * PATCH /reviews/:productId
+ * Edit your review
+ */
+router.patch("/:productId", requireAuth, async (req, res) => {
+  try {
+    const { rating, comment } = req.body;
+    const productId = req.params.productId;
+
+    const stats = await upsertProductReview({
+      userId: req.user.id,
+      productId,
+      rating,
+      comment,
+    });
+
+    res.json({ success: true, stats });
+  } catch (err) {
+    console.error("PATCH review error:", err);
+    res
+      .status(err.status || 500)
+      .json({ message: err.message || "Failed to edit review" });
+  }
+});
+
 export default router;

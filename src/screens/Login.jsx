@@ -22,15 +22,10 @@ const Login = () => {
 
     try {
       await dispatch(loginUser({ email, password }));
-      navigate("/shop"); // or navigate("/") or close modal
+      navigate("/shop");
     } catch (err) {
-      const msg = err.response?.data?.message;
-
-      if (msg?.toLowerCase().includes("verify")) {
-        setError("Please verify your email before logging in");
-      } else {
-        setError("Invalid email or password");
-      }
+      // Read message from thrown Error (loginUser already throws proper message)
+      setError(err.message || "Login failed");
     }
   };
 
@@ -44,9 +39,7 @@ const Login = () => {
 
         {/* Header */}
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-semibold text-white mb-2">
-            AdheroTape
-          </h1>
+          <h1 className="text-3xl font-semibold text-white mb-2">AdheroTape</h1>
           <p className="text-sm text-gray-400">Log in to continue</p>
         </div>
 

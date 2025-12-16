@@ -7,16 +7,18 @@ import db from "../config/db.js";
 export const getReviewsByProductIdQuery = async (productId) => {
   const [rows] = await db.query(
     `
-    SELECT
-      r.id,
-      r.rating,
-      r.comment,
-      r.created_at,
-      u.name AS user_name
-    FROM reviews r
-    JOIN users u ON u.id = r.user_id
-    WHERE r.product_id = ?
-    ORDER BY r.created_at DESC
+SELECT
+  r.id,
+  r.user_id,
+  r.rating,
+  r.comment,
+  r.created_at,
+  u.name AS user_name
+FROM reviews r
+JOIN users u ON u.id = r.user_id
+WHERE r.product_id = ?
+ORDER BY r.created_at DESC
+
     `,
     [productId]
   );
@@ -42,12 +44,13 @@ export const upsertReviewQuery = async ({
 
   await db.query(
     `
-    INSERT INTO reviews (user_id, product_id, rating, comment)
-    VALUES (?, ?, ?, ?)
-    ON DUPLICATE KEY UPDATE
-      rating = VALUES(rating),
-      comment = VALUES(comment),
-      created_at = CURRENT_TIMESTAMP
+   INSERT INTO reviews (user_id, product_id, rating, comment)
+VALUES (?, ?, ?, ?)
+ON DUPLICATE KEY UPDATE
+  rating = VALUES(rating),
+  comment = VALUES(comment),
+  created_at = CURRENT_TIMESTAMP
+
     `,
     [userId, productId, rating, safeComment]
   );
