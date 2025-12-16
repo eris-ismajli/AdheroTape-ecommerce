@@ -5,8 +5,9 @@ import {
   editReview,
   submitReview,
 } from "../store/reviews/actions";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ReviewModal from "./ReviewModal";
+import Modal from "./Modal";
 
 const ProductReviews = ({ reviews = [], loading, productId }) => {
   const dispatch = useDispatch();
@@ -14,6 +15,7 @@ const ProductReviews = ({ reviews = [], loading, productId }) => {
   const [editingReviewId, setEditingReviewId] = useState(null);
   const [editRating, setEditRating] = useState(0);
   const [editComment, setEditComment] = useState("");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   return (
     <section className="mt-20 w-full bg-black/30 border border-white/5 p-8 rounded-2xl">
@@ -76,7 +78,7 @@ const ProductReviews = ({ reviews = [], loading, productId }) => {
                     </button>
                     <button
                       className="text-sm text-red-400 hover:text-red-500"
-                      onClick={() => dispatch(deleteReview(productId))}
+                      onClick={() => setShowDeleteModal(true)}
                     >
                       Delete
                     </button>
@@ -90,7 +92,8 @@ const ProductReviews = ({ reviews = [], loading, productId }) => {
                     onSubmit={({ rating, comment }) => {
                       dispatch(
                         editReview({
-                          productId, // from prop
+                          reviewId: review.id,
+                          productId,
                           rating,
                           comment,
                         })
@@ -98,6 +101,22 @@ const ProductReviews = ({ reviews = [], loading, productId }) => {
                       setEditingReviewId(null);
                     }}
                     message={"Edit review"}
+                    currentComment={review.comment}
+                    currentRating={review.rating}
+                    isEditing={true}
+                  />
+                )}
+
+                {showDeleteModal && (
+                  <Modal
+                    message={
+                      "Are you sure you want to permanently delete this review?"
+                    }
+                    onConfirm={() => {
+                      dispatch(deleteReview(productId));
+                      setShowDeleteModal(false);
+                    }}
+                    onCancel={() => setShowDeleteModal(false)}
                   />
                 )}
               </div>

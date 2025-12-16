@@ -51,8 +51,20 @@ router.post("/verify-email", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   try {
-    const result = await login(req.body, res);
-    res.json(result);
+    const { user, accessToken, refreshToken, cart, wishlist } = await login(req.body);
+
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: 15 * 60 * 1000,
+    });
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    });
+
+    res.json({ user, cart, wishlist });
   } catch (e) {
     res.status(400).json({ message: e.message });
   }
@@ -74,7 +86,7 @@ router.post("/refresh", (req, res) => {
       maxAge: 15 * 60 * 1000,
     });
 
-    res.sendStatus(200);
+    res.json({ success: true });
   } catch {
     res.sendStatus(403);
   }
@@ -91,10 +103,11 @@ router.get("/me", requireAuth, async (req, res) => {
     const cart = await getCart({ userId: user.id }); // returns array
     const wishlist = await getWishlist({ userId: user.id }); // returns array
 
+
     res.json({
       user,
-      cart, 
-      wishlist, 
+      cart,
+      wishlist,
     });
   } catch (err) {
     console.error("Failed to fetch current user data:", err);

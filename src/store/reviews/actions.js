@@ -63,13 +63,12 @@ export const submitReview =
   };
 
 export const editReview =
-  ({ productId, rating, comment }) =>
+  ({ reviewId, productId, rating, comment }) =>
   async (dispatch, getState) => {
     try {
       dispatch({ type: REVIEW_SUBMIT_REQUEST });
 
       await axiosInstance.patch(`/reviews/${productId}`, {
-        productId,
         rating,
         comment,
       });
@@ -79,7 +78,7 @@ export const editReview =
       dispatch({
         type: REVIEW_SUBMIT_SUCCESS,
         payload: {
-          id: Date.now(), 
+          id: reviewId, // ✅ SAME ID
           rating,
           comment,
           created_at: new Date().toISOString(),

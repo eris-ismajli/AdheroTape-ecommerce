@@ -6,29 +6,21 @@ import { syncWishlistOnLogin } from "../wishlist/actions";
 import { syncCartOnLogin } from "../cart/actions";
 
 export const loginUser = (credentials) => async (dispatch) => {
-  try {
-    const { data } = await axiosInstance.post("/auth/login", credentials);
+  const { data } = await axiosInstance.post("/auth/login", credentials);
 
-    console.log("LOGIN RESPONSE", data);
+  dispatch({ type: LOGIN_SUCCESS, payload: { user: data.user } });
+  if (Array.isArray(data.cart))
+    dispatch({ type: REPLACE_CART, payload: data.cart });
+  if (Array.isArray(data.wishlist))
+    dispatch({ type: REPLACE_WISHLIST, payload: data.wishlist });
 
-    dispatch({ type: LOGIN_SUCCESS, payload: { user: data.user } });
+  // 🔑 read guest items ONCE
+  const guestCart = JSON.parse(localStorage.getItem("cart") || "[]");
+  const guestWishlist = JSON.parse(localStorage.getItem("wishlist") || "[]");
 
-    if (Array.isArray(data.cart)) {
-      dispatch({ type: REPLACE_CART, payload: data.cart });
-    }
-    if (Array.isArray(data.wishlist)) {
-      dispatch({ type: REPLACE_WISHLIST, payload: data.wishlist });
-    }
-
-    // 🔹 Only sync guest items after a fresh login
-    await dispatch(syncWishlistOnLogin());
-    await dispatch(syncCartOnLogin());
-
-    return data;
-  } catch (err) {
-    console.error("Login error", err.response?.data || err.message);
-    throw new Error(err.response?.data?.message || "Login failed");
-  }
+  // 🔑 pass them into sync functions
+  await dispatch(syncCartOnLogin(guestCart));
+  await dispatch(syncWishlistOnLogin(guestWishlist));
 };
 
 export const fetchCurrentUser = () => async (dispatch) => {

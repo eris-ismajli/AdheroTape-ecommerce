@@ -14,40 +14,37 @@ import ScrollToTop from "./utils/scrollToTop";
 
 import { fetchCart } from "./store/cart/actions";
 import { fetchWishlist } from "./store/wishlist/actions";
-import { setAuthToken } from "./utils/axiosInstance";
 import { LogOut, UserRoundCheck } from "lucide-react";
 import VerifyEmail from "./screens/VerifyEmail";
 import { fetchCurrentUser } from "./store/auth/actions";
 
 const App = () => {
   const dispatch = useDispatch();
-  const { token, isAuthenticated, user } = useSelector((s) => s.auth);
+  const { isAuthenticated, user } = useSelector((s) => s.auth);
 
   const hasMounted = useRef(false);
 
+  // 🔐 On app load, check session via cookie
   useEffect(() => {
     dispatch(fetchCurrentUser());
-  }, []);
+  }, [dispatch]);
 
-  // 🔑 1. Keep axios in sync with token
+  // 🛒 Load user data once authenticated
   useEffect(() => {
-    setAuthToken(token);
-  }, [token]);
-
-  useEffect(() => {
-    if (isAuthenticated && token) {
+    if (isAuthenticated) {
       dispatch(fetchCart());
       dispatch(fetchWishlist());
     }
-  }, [isAuthenticated, token]);
+  }, [isAuthenticated, dispatch]);
 
+  // 🔔 Toasts
   useEffect(() => {
     if (!hasMounted.current) {
       hasMounted.current = true;
       return;
     }
 
-    if (isAuthenticated && user?.name) {
+    if (isAuthenticated && user?.name && user?.emailVerified) {
       toast(`Welcome, ${user.name}`, {
         icon: <UserRoundCheck className="text-green-400" />,
       });
@@ -58,8 +55,8 @@ const App = () => {
         icon: <LogOut className="text-zinc-400" />,
       });
     }
-  }, [isAuthenticated]);
-
+  }, [isAuthenticated, user]);
+  
   return (
     <Router>
       <ScrollToTop />

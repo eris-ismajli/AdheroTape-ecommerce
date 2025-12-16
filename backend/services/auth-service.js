@@ -151,9 +151,15 @@ export async function login({ email, password }, res) {
 
   const cartData = await getCart({ userId: user.id });
   const wishlistData = await getWishlist({ userId: user.id });
+  const emailVerified = user.email_verified;
 
   return {
-    user: { id: user.id, name: user.name, email: user.email },
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      emailVerified: user.email_verified,
+    },
     cart: { items: cartData.items || cartData || [] },
     wishlist: { items: wishlistData.items || wishlistData || [] },
     accessToken,

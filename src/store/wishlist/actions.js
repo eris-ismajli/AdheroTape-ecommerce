@@ -52,21 +52,16 @@ export const toggleWishlist = (product) => async (dispatch, getState) => {
   });
 };
 
-export const syncWishlistOnLogin = () => async (dispatch) => {
-  const guestWishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
-
+export const syncWishlistOnLogin = (guestWishlist) => async (dispatch) => {
   if (!guestWishlist.length) return;
 
-  const productIds = guestWishlist.map((item) => item.id);
-
   const { data } = await axiosInstance.post("/user/wishlist/sync", {
-    productIds,
+    productIds: guestWishlist.map((i) => i.id),
   });
 
-  dispatch({
-    type: REPLACE_WISHLIST,
-    payload: data.items,
-  });
+  console.log("SYNCING WISHLIST:", data)
 
-  localStorage.removeItem("wishlist");
+  dispatch({ type: REPLACE_WISHLIST, payload: data.items });
+
+  localStorage.removeItem("wishlist"); // only remove wishlist
 };

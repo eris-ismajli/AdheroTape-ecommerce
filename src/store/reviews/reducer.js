@@ -47,12 +47,19 @@ export default function reviewsReducer(state = initialState, action) {
         error: null,
       };
 
-    case REVIEW_SUBMIT_SUCCESS:
+    case REVIEW_SUBMIT_SUCCESS: {
+      const updated = action.payload;
+
+      const exists = state.items.some((r) => r.id === updated.id);
+
       return {
         ...state,
         submitting: false,
-        items: [action.payload, ...state.items],
+        items: exists
+          ? state.items.map((r) => (r.id === updated.id ? updated : r))
+          : [updated, ...state.items],
       };
+    }
 
     case REVIEW_SUBMIT_FAIL:
       return {

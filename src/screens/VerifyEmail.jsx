@@ -4,14 +4,12 @@ import axiosInstance from "../utils/axiosInstance";
 import toast from "react-hot-toast";
 
 import { useDispatch } from "react-redux";
-import { LOGIN_SUCCESS } from "../store/auth/constants";
-import { setAuthToken } from "../utils/axiosInstance";
+import { fetchCurrentUser } from "../store/auth/actions";
 
 import { Loader2, UserRoundCheck } from "lucide-react";
 
 const VerifyEmail = () => {
   const dispatch = useDispatch();
-
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -35,24 +33,14 @@ const VerifyEmail = () => {
     setLoading(true);
 
     try {
-      const { data } = await axiosInstance.post("/auth/verify-email", {
+      // Backend sets cookies here
+      await axiosInstance.post("/auth/verify-email", {
         email,
         code,
       });
 
-      dispatch({
-        type: LOGIN_SUCCESS,
-        payload: {
-          token: data.token,
-          user: data.user,
-        },
-      });
-
-      setAuthToken(data.token);
-
-      toast(`Welcome, ${data.user.name}`, {
-        icon: <UserRoundCheck className="text-green-400" />,
-      });
+      // 🔐 Ask server who the user is
+      await dispatch(fetchCurrentUser());
 
       navigate("/shop");
     } catch (err) {
@@ -98,12 +86,12 @@ const VerifyEmail = () => {
           <button
             disabled={loading || code.length !== 6}
             className="
-    w-full rounded-xl py-3 bg-gradient-to-r
-    from-yellow-400 to-yellow-500 text-black font-semibold
-    transition-all duration-200
-    disabled:opacity-50 disabled:cursor-not-allowed
-    flex items-center justify-center gap-2
-  "
+              w-full rounded-xl py-3 bg-gradient-to-r
+              from-yellow-400 to-yellow-500 text-black font-semibold
+              transition-all duration-200
+              disabled:opacity-50 disabled:cursor-not-allowed
+              flex items-center justify-center gap-2
+            "
           >
             {loading ? (
               <>

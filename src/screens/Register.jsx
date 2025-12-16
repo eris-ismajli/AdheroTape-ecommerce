@@ -218,7 +218,7 @@ const Register = () => {
     active:scale-[0.98]
   "
           >
-            Continue to shop
+            Continue as Guest
           </button>
         </form>
 

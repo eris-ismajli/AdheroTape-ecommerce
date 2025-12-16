@@ -1,9 +1,24 @@
 import { X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-const ReviewModal = ({ onClose, onSubmit, submitting, message }) => {
+const ReviewModal = ({
+  onClose,
+  onSubmit,
+  submitting,
+  message,
+  currentComment = "",
+  currentRating = null,
+  isEditing = false,
+}) => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
+
+  useEffect(() => {
+    if (currentComment === "") return;
+    setComment(currentComment);
+    if (currentRating === null) return;
+    setRating(currentRating);
+  }, []);
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center">
@@ -15,9 +30,7 @@ const ReviewModal = ({ onClose, onSubmit, submitting, message }) => {
           <X />
         </button>
 
-        <h3 className="text-lg font-semibold text-white mb-4">
-          {message}
-        </h3>
+        <h3 className="text-lg font-semibold text-white mb-4">{message}</h3>
 
         {/* Stars */}
         <div className="flex gap-2 mb-4">
@@ -45,6 +58,7 @@ const ReviewModal = ({ onClose, onSubmit, submitting, message }) => {
             p-3 text-sm text-white placeholder-zinc-500
             focus:outline-none focus:border-yellow-400
           "
+          autoFocus={true}
         />
 
         <button
@@ -59,7 +73,13 @@ const ReviewModal = ({ onClose, onSubmit, submitting, message }) => {
             }
           `}
         >
-          {submitting ? "Submitting…" : "Submit review"}
+          {isEditing
+            ? submitting
+              ? "Applying changes..."
+              : "Save changes"
+            : submitting
+            ? "Submitting…"
+            : "Submit review"}
         </button>
       </div>
     </div>

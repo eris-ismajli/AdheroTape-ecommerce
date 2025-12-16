@@ -70,7 +70,7 @@ router.delete("/:productId", requireAuth, async (req, res) => {
 });
 
 /**
- * PATCH /reviews/:productId
+ * PATCH /reviews/:productI
  * Edit your review
  */
 router.patch("/:productId", requireAuth, async (req, res) => {

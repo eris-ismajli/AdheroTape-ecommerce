@@ -61,35 +61,44 @@ export const fetchCart = () => async (dispatch, getState) => {
   }
 };
 
-export const syncCartOnLogin = () => async (dispatch) => {
-  const guestCart = JSON.parse(localStorage.getItem("cart")) || [];
+export const syncWishlistOnLogin = () => async (dispatch) => {
+  const guestWishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
 
-  if (!guestCart.length) return;
+  if (!guestWishlist.length) return;
 
-  const payload = {
-    items: guestCart
-      .filter((item) => item.productId) // 👈 DROP BROKEN ITEMS
-      .map((item) => ({
-        productId: item.productId,
-        quantity: item.quantity,
-        chosenColor: item.chosenColor ?? null,
-        chosenWidth: item.chosenWidth ?? null,
-        chosenLength: item.chosenLength ?? null,
-      })),
-  };
+  const productIds = guestWishlist.map((item) => item.id);
 
-  const { data } = await axiosInstance.post("/user/cart/sync", payload);
-
-  console.log("SYNCING CART ON LOGIN:", data)
+  const { data } = await axiosInstance.post("/user/wishlist/sync", {
+    productIds,
+  });
 
   dispatch({
-    type: REPLACE_CART,
+    type: REPLACE_WISHLIST,
     payload: data.items,
   });
 
-  localStorage.removeItem("cart");
+  localStorage.removeItem("wishlist");
 };
 
+export const syncCartOnLogin = (guestCart) => async (dispatch) => {
+  if (!guestCart.length) return;
+
+  const payload = guestCart.map(item => ({
+    productId: item.productId,
+    quantity: item.quantity,
+    chosenColor: item.chosenColor ?? null,
+    chosenWidth: item.chosenWidth ?? null,
+    chosenLength: item.chosenLength ?? null,
+  }));
+
+  const { data } = await axiosInstance.post("/user/cart/sync", { items: payload });
+
+  console.log("SYNCING CART:", data)
+
+  dispatch({ type: REPLACE_CART, payload: data.items });
+
+  localStorage.removeItem("cart"); // only remove cart
+};
 export const addToCart = (payload) => async (dispatch, getState) => {
   const { auth } = getState();
 
