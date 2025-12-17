@@ -58,9 +58,7 @@ const db = await mysql.createPool({
       );
     }
 
-    console.log("Imported:", p.title || p.url);
   }
 
-  console.log("✔ Import complete!");
   process.exit();
 })();
