@@ -37,15 +37,22 @@ export default function cartReducer(state = initialState, action) {
     // 👇 ALL BELOW IS GUEST-ONLY (unchanged)
 
     case ADD_TO_CART: {
-      const { product, quantity, chosenColor, chosenWidth, chosenLength } =
-        action.payload;
+      const { product, quantity } = action.payload;
+
+      const incoming = {
+        productId: product.id,
+        quantity,
+        chosenColor: action.payload.chosenColor ?? null,
+        chosenWidth: action.payload.chosenWidth ?? null,
+        chosenLength: action.payload.chosenLength ?? null,
+      };
 
       const existingItem = state.items.find(
         (item) =>
-          item.id === product.id &&
-          item.chosenColor === chosenColor &&
-          item.chosenWidth === chosenWidth &&
-          item.chosenLength === chosenLength
+          item.productId === incoming.productId &&
+          (item.chosenColor ?? null) === incoming.chosenColor &&
+          (item.chosenWidth ?? null) === incoming.chosenWidth &&
+          (item.chosenLength ?? null) === incoming.chosenLength
       );
 
       let updatedItems;
@@ -53,23 +60,19 @@ export default function cartReducer(state = initialState, action) {
       if (existingItem) {
         updatedItems = state.items.map((item) =>
           item === existingItem
-            ? { ...item, quantity: item.quantity + quantity }
+            ? { ...item, quantity: item.quantity + incoming.quantity }
             : item
         );
       } else {
         updatedItems = [
           ...state.items,
           {
-            clientItemId: crypto.randomUUID(), // 👈 guest-only id
-            productId: product.id, // 👈 ALWAYS THIS
+            clientItemId: crypto.randomUUID(),
+            ...incoming,
             title: product.title,
             price_raw: product.price_raw,
             images: product.images,
             category: product.category,
-            quantity,
-            chosenColor,
-            chosenWidth,
-            chosenLength,
           },
         ];
       }
@@ -82,13 +85,14 @@ export default function cartReducer(state = initialState, action) {
       const id = action.payload;
 
       const existing = state.items.find(
-        (item) => item.cartItemId === id || item.id === id
+        (item) =>
+          item.clientItemId === id || item.cartItemId === id || item.id === id
       );
 
       if (!existing || existing.quantity === 1) return state;
 
       const updatedItems = state.items.map((item) =>
-        item.cartItemId === id || item.id === id
+        item.clientItemId === id || item.cartItemId === id || item.id === id
           ? { ...item, quantity: item.quantity - 1 }
           : item
       );

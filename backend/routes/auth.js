@@ -96,6 +96,7 @@ router.post("/refresh", (req, res) => {
 router.get("/me", requireAuth, async (req, res) => {
   try {
     const user = await getUserById(req.user.id);
+    console.log(user)
 
     const { getCart } = await import("../services/cart-service.js");
     const { getWishlist } = await import("../services/wishlist-service.js");

@@ -49,13 +49,29 @@ export const fetchCurrentUser = () => async (dispatch) => {
   }
 };
 
+const getGuestState = () => ({
+  cart: JSON.parse(localStorage.getItem("cart") || "[]"),
+  wishlist: JSON.parse(localStorage.getItem("wishlist") || "[]"),
+});
+
 export const registerUser = (payload) => async (dispatch) => {
   const { data } = await axiosInstance.post("/auth/register", payload);
 
   if (data.user) {
-    dispatch({ type: LOGIN_SUCCESS, payload: { user: data.user } });
-    await dispatch(syncWishlistOnLogin());
-    await dispatch(syncCartOnLogin());
+    dispatch({
+      type: LOGIN_SUCCESS,
+      payload: { user: data.user },
+    });
+
+    const { cart, wishlist } = getGuestState();
+
+    if (cart.length) {
+      await dispatch(syncCartOnLogin(cart));
+    }
+
+    if (wishlist.length) {
+      await dispatch(syncWishlistOnLogin(wishlist));
+    }
   }
 
   return data;
