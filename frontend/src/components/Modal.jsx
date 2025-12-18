@@ -15,7 +15,7 @@ const Modal = ({ message, onConfirm, onCancel, title }) => {
       <div
         onClick={(e) => e.stopPropagation()}
         className="
-          relative p-7 w-[90%] max-w-md rounded-2xl
+          relative p-6 w-[90%] max-w-md rounded-2xl
          shadow-[0_4px_20px_rgba(0,0,0,0.45)]
           text-white
           animate-scaleIn
@@ -26,11 +26,11 @@ const Modal = ({ message, onConfirm, onCancel, title }) => {
 
         <p className="text-white/60 text-lg mb-6 text-center">{message}</p>
 
-        <div className="flex justify-center gap-6 mt-4">
+        <div className="flex justify-center gap-8 mt-4">
           <button
             onClick={onCancel}
             className="
-    px-4 py-2
+    
     text-white/60 text-lg
     hover:text-white
     hover:scale-110
@@ -41,12 +41,11 @@ const Modal = ({ message, onConfirm, onCancel, title }) => {
             Cancel
           </button>
 
-          <div className="h-[50px] w-px bg-white/10" />
+          <div className="h-[40px] w-px bg-white/10" />
 
           <button
             onClick={onConfirm}
             className="
-    px-4 py-2
     text-blue-400 text-lg
     hover:text-blue-200
     hover:scale-110

@@ -29,7 +29,7 @@ const ShippingStep = ({ data, setData, onNext, onBack }) => {
       <div className="rounded-2xl border border-white/5 bg-black/80 shadow-[0_0_40px_rgba(0,0,0,0.6)] p-8 space-y-8 shadow-black/30 transition-all duration-300 hover:shadow-3xl hover:shadow-black/40">
         {/* Header with progress indicator */}
         <div className="pointer-events-none absolute top-0 left-60 w-[450px] h-[450px] bg-blue-500/10 rounded-full blur-[120px]" />
-        <div className="pointer-events-none absolute -bottom-40 right-60 w-[450px] h-[450px] bg-green-300/5 rounded-full blur-[120px]" />
+        <div className="pointer-events-none absolute -bottom-40 right-60 w-[450px] h-[450px] bg-green-300/10 rounded-full blur-[120px]" />
 
         <div className="space-y-6">
           <div className="flex items-center gap-3">

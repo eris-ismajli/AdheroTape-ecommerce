@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { registerUser } from "../store/auth/actions";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 
 const Register = () => {
   const dispatch = useDispatch();
@@ -13,6 +14,7 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,9 +57,8 @@ const Register = () => {
     <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-black via-zinc-950 to-black">
       <div className="relative w-full max-w-md rounded-2xl border border-white/10 bg-black/60 backdrop-blur-xl shadow-[0_0_40px_rgba(0,0,0,0.6)] p-8">
         {/* Accent glows */}
-        <div className="pointer-events-none absolute -top-24 -left-24 w-72 h-72 bg-blue-500/10 rounded-full blur-[120px]" />
-        <div className="pointer-events-none absolute -bottom-24 -right-24 w-72 h-72 bg-yellow-400/10 rounded-full blur-[120px]" />
-
+        <div className="pointer-events-none absolute -top-24 -left-24 w-72 h-72 bg-blue-400/15 rounded-full blur-[120px]" />
+        <div className="pointer-events-none absolute -bottom-24 -right-24 w-72 h-72 bg-yellow-500/15 rounded-full blur-[120px]" />
         {/* Header */}
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-semibold text-white mb-2">
@@ -102,7 +103,7 @@ const Register = () => {
             </label>
             <input
               type="text"
-              placeholder="John Doe"
+              placeholder="Your Name"
               className={`
     w-full rounded-xl bg-zinc-900/70 px-4 py-3 text-sm
     text-white placeholder-gray-500 transition focus:outline-none
@@ -137,7 +138,7 @@ const Register = () => {
     ${
       errors.email
         ? "border border-red-500/50 focus:ring-2 focus:ring-red-500/40"
-        : "border border-white/10 focus:ring-2 focus:ring-yellow-400/60"
+        : "border border-white/10 focus:ring-2 focus:ring-blue-400/60"
     }
   `}
               onChange={(e) => {
@@ -150,24 +151,53 @@ const Register = () => {
             )}
           </div>
 
-          {/* Password */}
-          <div>
+          {/* Password
+  //         <div>
+  //           <label className="block text-xs uppercase tracking-wide text-gray-400 mb-2">
+  //             Password
+  //           </label>
+  //           <input
+  //             autoComplete="new-password"
+  //             type="password"
+  //             placeholder="••••••••"
+  //             className={`
+  //   w-full rounded-xl bg-zinc-900/70 px-4 py-3 text-sm
+  //   text-white placeholder-gray-500 transition focus:outline-none
+  //   ${
+  //     errors.password
+  //       ? "border border-red-500/50 focus:ring-2 focus:ring-red-500/40"
+  //       : "border border-white/10 focus:ring-2 focus:ring-blue-400/50"
+  //   }
+  // `}
+  //             onChange={(e) => {
+  //               setPassword(e.target.value);
+  //               if (errors.password)
+  //                 setErrors((p) => ({ ...p, password: null }));
+  //             }}
+  //           />
+  //           {errors.password && (
+  //             <p className="mt-1 text-xs text-red-400">{errors.password}</p>
+  //           )}
+  //         </div> */}
+
+          <div className="relative">
             <label className="block text-xs uppercase tracking-wide text-gray-400 mb-2">
               Password
             </label>
             <input
-              autoComplete="new-password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="••••••••"
               className={`
-    w-full rounded-xl bg-zinc-900/70 px-4 py-3 text-sm
-    text-white placeholder-gray-500 transition focus:outline-none
-    ${
-      errors.password
-        ? "border border-red-500/50 focus:ring-2 focus:ring-red-500/40"
-        : "border border-white/10 focus:ring-2 focus:ring-blue-400/50"
-    }
-  `}
+          w-full rounded-xl bg-zinc-900/70 border border-white/10
+          px-4 py-3 pr-12 text-sm text-white placeholder-gray-500
+          focus:outline-none focus:ring-2 focus:ring-blue-400/50
+          transition      ${
+            errors.password
+              ? "border border-red-500/50 focus:ring-2 focus:ring-red-500/40"
+              : "border border-white/10 focus:ring-2 focus:ring-blue-400/50"
+          }
+      `}
+              value={password}
               onChange={(e) => {
                 setPassword(e.target.value);
                 if (errors.password)
@@ -177,6 +207,25 @@ const Register = () => {
             {errors.password && (
               <p className="mt-1 text-xs text-red-400">{errors.password}</p>
             )}
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="
+          absolute right-1.5 bottom-1.5
+          p-1.5 rounded-lg
+          hover:bg-white/10 
+          transition-colors duration-150
+
+        "
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              title={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? (
+                <EyeOff className="w-5 h-5 text-gray-400" />
+              ) : (
+                <Eye className="w-5 h-5 text-gray-400" />
+              )}
+            </button>
           </div>
 
           <button

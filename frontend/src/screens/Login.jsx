@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { loginUser } from "../store/auth/actions";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -11,6 +12,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     setError("");
@@ -34,8 +36,8 @@ const Login = () => {
       {/* Card */}
       <div className="relative w-full max-w-md rounded-2xl border border-white/10 bg-black/60 backdrop-blur-xl shadow-[0_0_40px_rgba(0,0,0,0.6)] p-8">
         {/* Accent glow */}
-        <div className="pointer-events-none absolute -top-24 -left-24 w-72 h-72 bg-yellow-400/10 rounded-full blur-[120px]" />
-        <div className="pointer-events-none absolute -bottom-24 -right-24 w-72 h-72 bg-blue-500/10 rounded-full blur-[120px]" />
+        <div className="pointer-events-none absolute -top-24 -left-24 w-72 h-72 bg-blue-400/15 rounded-full blur-[120px]" />
+        <div className="pointer-events-none absolute -bottom-24 -right-24 w-72 h-72 bg-yellow-500/15 rounded-full blur-[120px]" />
 
         {/* Header */}
         <div className="mb-8 text-center">
@@ -56,7 +58,7 @@ const Login = () => {
               className="
                 w-full rounded-xl bg-zinc-900/70 border border-white/10
                 px-4 py-3 text-sm text-white placeholder-gray-500
-                focus:outline-none focus:ring-2 focus:ring-yellow-400/60
+                focus:outline-none focus:ring-2 focus:ring-blue-400/60
                 transition
               "
               onChange={(e) => setEmail(e.target.value)}
@@ -64,21 +66,42 @@ const Login = () => {
           </div>
 
           {/* Password */}
-          <div>
+
+          <div className="relative">
             <label className="block text-xs uppercase tracking-wide text-gray-400 mb-2">
               Password
             </label>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="••••••••"
               className="
-                w-full rounded-xl bg-zinc-900/70 border border-white/10
-                px-4 py-3 text-sm text-white placeholder-gray-500
-                focus:outline-none focus:ring-2 focus:ring-blue-400/50
-                transition
-              "
+          w-full rounded-xl bg-zinc-900/70 border border-white/10
+          px-4 py-3 pr-12 text-sm text-white placeholder-gray-500
+          focus:outline-none focus:ring-2 focus:ring-blue-400/50
+          transition
+        "
+              value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="
+          absolute right-1.5 bottom-1.5
+          p-1.5 rounded-lg
+          hover:bg-white/10 
+          transition-colors duration-150
+
+        "
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              title={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? (
+                <EyeOff className="w-5 h-5 text-gray-400" />
+              ) : (
+                <Eye className="w-5 h-5 text-gray-400" />
+              )}
+            </button>
           </div>
 
           {error && (

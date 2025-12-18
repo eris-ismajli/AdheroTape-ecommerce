@@ -1,4 +1,4 @@
-import { LOGIN_SUCCESS, LOGOUT } from "./constants";
+import { LOGIN_SUCCESS, LOGOUT, UPDATE_USER } from "./constants";
 import axiosInstance from "../../utils/axiosInstance";
 import { REPLACE_CART } from "../cart/constants";
 import { REPLACE_WISHLIST } from "../wishlist/constants";
@@ -6,28 +6,55 @@ import { syncWishlistOnLogin } from "../wishlist/actions";
 import { syncCartOnLogin } from "../cart/actions";
 
 export const loginUser = (credentials) => async (dispatch) => {
-  const { data } = await axiosInstance.post("/auth/login", credentials);
+  try {
+    const { data } = await axiosInstance.post("/auth/login", credentials);
 
-  dispatch({ type: LOGIN_SUCCESS, payload: { user: data.user } });
-  if (Array.isArray(data.cart))
-    dispatch({ type: REPLACE_CART, payload: data.cart });
-  if (Array.isArray(data.wishlist))
-    dispatch({ type: REPLACE_WISHLIST, payload: data.wishlist });
+    dispatch({ type: LOGIN_SUCCESS, payload: { user: data.user } });
+    if (Array.isArray(data.cart))
+      dispatch({ type: REPLACE_CART, payload: data.cart });
+    if (Array.isArray(data.wishlist))
+      dispatch({ type: REPLACE_WISHLIST, payload: data.wishlist });
 
-  // 🔑 read guest items ONCE
-  const guestCart = JSON.parse(localStorage.getItem("cart") || "[]");
-  const guestWishlist = JSON.parse(localStorage.getItem("wishlist") || "[]");
+    const guestCart = JSON.parse(localStorage.getItem("cart") || "[]");
+    const guestWishlist = JSON.parse(localStorage.getItem("wishlist") || "[]");
 
-  // 🔑 pass them into sync functions
-  await dispatch(syncCartOnLogin(guestCart));
-  await dispatch(syncWishlistOnLogin(guestWishlist));
+    await dispatch(syncCartOnLogin(guestCart));
+    await dispatch(syncWishlistOnLogin(guestWishlist));
+
+    return data;
+  } catch (err) {
+    // Throw backend error message
+    throw new Error(err.response?.data?.message || "Login failed");
+  }
 };
+
+export const updateUserPass =
+  (newPassword, currentPassword) => async (dispatch) => {
+    try {
+      const { data } = await axiosInstance.patch("/profile/update-password", {
+        newPassword,
+        currentPassword,
+      });
+
+      dispatch({
+        type: UPDATE_USER,
+        payload: { user: data.user },
+      });
+
+      return data;
+    } catch (err) {
+      // Throw the backend error message
+      throw new Error(
+        err.response?.data?.message || "Failed to update password"
+      );
+    }
+  };
 
 export const fetchCurrentUser = () => async (dispatch) => {
   try {
     const { data } = await axiosInstance.get("/auth/me");
 
-    ("CURRENT USER", data);
+    "CURRENT USER", data;
 
     if (data.user) {
       dispatch({
@@ -85,4 +112,22 @@ export const logoutUser = () => async (dispatch) => {
   }
 
   dispatch({ type: LOGOUT });
+};
+
+export const updateUserName = (newName) => async (dispatch) => {
+  try {
+    const { data } = await axiosInstance.patch("/profile/update-name", {
+      name: newName,
+    });
+
+    dispatch({
+      type: UPDATE_USER,
+      payload: { user: data.user },
+    });
+  } catch (err) {
+    console.error(
+      "Error updating name",
+      err.response?.data?.message || err.message
+    );
+  }
 };

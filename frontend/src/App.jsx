@@ -18,6 +18,7 @@ import { LogOut, UserRoundCheck } from "lucide-react";
 import VerifyEmail from "./screens/VerifyEmail";
 import { fetchCurrentUser } from "./store/auth/actions";
 import CheckoutWrapper from "./screens/Checkout";
+import Profile from "./screens/Profile";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -46,9 +47,7 @@ const App = () => {
     }
 
     if (isAuthenticated && user?.name && user?.emailVerified) {
-      toast(`Welcome, ${user.name}`, {
-        icon: <UserRoundCheck className="text-green-400" />,
-      });
+
     }
 
     if (!isAuthenticated) {
@@ -88,6 +87,7 @@ const App = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/checkout" element={<CheckoutWrapper />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </Router>
   );

@@ -19,7 +19,7 @@ export async function getUserByEmail(email) {
 
 export async function getUserById(id) {
   const [rows] = await db.query(
-    `SELECT id, name, email FROM users WHERE id = ?`,
+    `SELECT id, name, email, password_hash FROM users WHERE id = ?`,
     [id]
   );
   return rows[0];

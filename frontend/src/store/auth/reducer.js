@@ -1,4 +1,4 @@
-import { LOGIN_SUCCESS, LOGOUT } from "./constants";
+import { LOGIN_SUCCESS, LOGOUT, UPDATE_USER } from "./constants";
 
 const initialState = {
   user: null,
@@ -12,6 +12,12 @@ export default function authReducer(state = initialState, action) {
         ...state,
         user: action.payload.user,
         isAuthenticated: true,
+      };
+
+    case UPDATE_USER:
+      return {
+        ...state,
+        user: action.payload.user,
       };
 
     case LOGOUT:

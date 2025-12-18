@@ -85,7 +85,7 @@ const PaymentStep = ({ shippingData, cartItems, total, onBack, onSuccess }) => {
     <div className="max-w-4xl mx-auto relative">
       {/* Background Glow */}
       <div className="pointer-events-none absolute top-0 left-0 w-[400px] h-[400px] bg-blue-500/10 rounded-full blur-[120px]" />
-      <div className="pointer-events-none absolute -bottom-40 -right-20 w-[400px] h-[400px] bg-green-300/5 rounded-full blur-[120px]" />
+      <div className="pointer-events-none absolute -bottom-40 -right-20 w-[400px] h-[400px] bg-green-300/10 rounded-full blur-[120px]" />
 
       {/* Card */}
       <div className="rounded-2xl border border-white/5 bg-black/50 shadow-[0_0_40px_rgba(0,0,0,0.6)] p-8 space-y-8 transition-all duration-300 hover:shadow-3xl hover:shadow-black/40">

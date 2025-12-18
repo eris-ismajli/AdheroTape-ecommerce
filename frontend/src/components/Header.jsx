@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 
 import { useSelector, useDispatch } from "react-redux";
 import { selectCartCount } from "../store/cart/selectors";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, UserRound } from "lucide-react";
 
 import logoNoText from "../assets/logo-notext.png";
 import { useNavigate } from "react-router-dom";
@@ -26,6 +26,7 @@ const Header = ({
   const wishlistCount = useSelector(selectWishlistCount);
 
   const isAuthenticated = useSelector((state) => state.auth?.isAuthenticated);
+  const user = useSelector((state) => state.auth?.user);
 
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef(null);
@@ -195,6 +196,13 @@ const Header = ({
       z-50
     "
                         >
+                          <div className="px-4 py-3 flex items-center gap-2">
+                            <UserRound color="gray" size={16}/>
+                            <p className=" text-white/50 line-clamp-1 text-sm">{user.name}</p>
+                          </div>
+
+                          <div className="h-px bg-white/10" />
+
                           <button
                             onClick={() => {
                               navigate("/profile");
