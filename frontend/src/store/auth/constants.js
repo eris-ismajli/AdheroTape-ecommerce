@@ -1,3 +1,4 @@
 export const LOGIN_SUCCESS = "LOGIN_SUCCESS";
 export const LOGOUT = "LOGOUT";
 export const UPDATE_USER = "UPDATE_USER";
+export const AUTH_LOADING_FINISHED = "AUTH_LOADING_FINISHED";

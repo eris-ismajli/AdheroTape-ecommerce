@@ -14,7 +14,7 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showPassword, setShowPassword] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -150,35 +150,6 @@ const Register = () => {
               <p className="mt-1 text-xs text-red-400">{errors.email}</p>
             )}
           </div>
-
-          {/* Password
-  //         <div>
-  //           <label className="block text-xs uppercase tracking-wide text-gray-400 mb-2">
-  //             Password
-  //           </label>
-  //           <input
-  //             autoComplete="new-password"
-  //             type="password"
-  //             placeholder="••••••••"
-  //             className={`
-  //   w-full rounded-xl bg-zinc-900/70 px-4 py-3 text-sm
-  //   text-white placeholder-gray-500 transition focus:outline-none
-  //   ${
-  //     errors.password
-  //       ? "border border-red-500/50 focus:ring-2 focus:ring-red-500/40"
-  //       : "border border-white/10 focus:ring-2 focus:ring-blue-400/50"
-  //   }
-  // `}
-  //             onChange={(e) => {
-  //               setPassword(e.target.value);
-  //               if (errors.password)
-  //                 setErrors((p) => ({ ...p, password: null }));
-  //             }}
-  //           />
-  //           {errors.password && (
-  //             <p className="mt-1 text-xs text-red-400">{errors.password}</p>
-  //           )}
-  //         </div> */}
 
           <div className="relative">
             <label className="block text-xs uppercase tracking-wide text-gray-400 mb-2">

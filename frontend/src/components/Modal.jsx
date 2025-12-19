@@ -33,7 +33,7 @@ const Modal = ({ message, onConfirm, onCancel, title }) => {
     
     text-white/60 text-lg
     hover:text-white
-    hover:scale-110
+    hover:scale-105
     hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]
     transition-all duration-200 ease-out
   "
@@ -48,7 +48,7 @@ const Modal = ({ message, onConfirm, onCancel, title }) => {
             className="
     text-blue-400 text-lg
     hover:text-blue-200
-    hover:scale-110
+    hover:scale-105
     hover:drop-shadow-[0_0_8px_rgba(59,130,246,0.4)]
     transition-all duration-200 ease-out
   "

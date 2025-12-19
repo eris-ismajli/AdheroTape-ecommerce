@@ -51,7 +51,7 @@ router.post("/verify-email", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   try {
-    const { user, accessToken, refreshToken, cart, wishlist } = await login(req.body);
+    const { user, accessToken, refreshToken, cart, wishlist, role } = await login(req.body);
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
@@ -64,7 +64,7 @@ router.post("/login", async (req, res) => {
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
 
-    res.json({ user, cart, wishlist });
+    res.json({ user, cart, wishlist, role });
   } catch (e) {
     res.status(400).json({ message: e.message });
   }

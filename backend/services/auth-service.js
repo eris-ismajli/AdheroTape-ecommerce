@@ -159,6 +159,7 @@ export async function login({ email, password }, res) {
       name: user.name,
       email: user.email,
       emailVerified: user.email_verified,
+      role: user.role
     },
     cart: { items: cartData.items || cartData || [] },
     wishlist: { items: wishlistData.items || wishlistData || [] },

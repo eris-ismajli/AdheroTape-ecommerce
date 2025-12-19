@@ -11,6 +11,7 @@ import cartRoute from "./routes/cart.js";
 import reviewsRoute from "./routes/reviews.js";
 import checkoutRoute from "./routes/checkout.js";
 import profileRoute from "./routes/profile.js";
+import adminRoute from "./routes/admin.js"
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ app.use("/user/cart", cartRoute);
 app.use("/reviews", reviewsRoute);
 app.use("/api/checkout", checkoutRoute);
 app.use("/profile", profileRoute);
+app.use("/admin", adminRoute);
 
 app.listen(process.env.PORT, () =>
   console.log(`Server running on port ${process.env.PORT}`)

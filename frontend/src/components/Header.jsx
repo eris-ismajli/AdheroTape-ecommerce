@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 
 import { useSelector, useDispatch } from "react-redux";
 import { selectCartCount } from "../store/cart/selectors";
@@ -12,6 +12,8 @@ import { selectWishlistCount } from "../store/wishlist/selectors";
 import { logoutUser } from "../store/auth/actions";
 import EventBus from "../utils/eventBus";
 
+import { useProfileModal } from "./ProfileModalContext";
+
 const Header = ({
   navLinks,
   navButtons,
@@ -19,6 +21,7 @@ const Header = ({
   showSearch = false,
   isAsideSticky,
 }) => {
+  const { setShowProfileModal } = useProfileModal();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -197,16 +200,18 @@ const Header = ({
     "
                         >
                           <div className="px-4 py-3 flex items-center gap-2">
-                            <UserRound color="gray" size={16}/>
-                            <p className=" text-white/50 line-clamp-1 text-sm">{user.name}</p>
+                            <UserRound color="gray" size={16} />
+                            <p className=" text-white/50 line-clamp-1 text-sm">
+                              {user.name}
+                            </p>
                           </div>
 
                           <div className="h-px bg-white/10" />
 
                           <button
                             onClick={() => {
-                              navigate("/profile");
                               setProfileOpen(false);
+                              setShowProfileModal(true)
                             }}
                             className="
             w-full text-left px-4 py-3 text-sm text-white/80

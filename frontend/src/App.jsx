@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import toast, { Toaster } from "react-hot-toast";
 
 import LandingPage from "./LandingPage";
@@ -19,12 +19,16 @@ import VerifyEmail from "./screens/VerifyEmail";
 import { fetchCurrentUser } from "./store/auth/actions";
 import CheckoutWrapper from "./screens/Checkout";
 import Profile from "./screens/Profile";
+import { useProfileModal } from "./components/ProfileModalContext";
+import AdminRoute from "./components/AdminRoute";
+import AdminDashboard from "./screens/AdminDashboard";
+import AdminLogin from "./screens/AdminLogin";
 
 const App = () => {
-  const dispatch = useDispatch();
-  const { isAuthenticated, user } = useSelector((s) => s.auth);
+  const { showProfileModal } = useProfileModal();
 
-  const hasMounted = useRef(false);
+  const dispatch = useDispatch();
+  const { isAuthenticated, user, isAuthLoading } = useSelector((s) => s.auth);
 
   // 🔐 On app load, check session via cookie
   useEffect(() => {
@@ -41,21 +45,18 @@ const App = () => {
 
   // 🔔 Toasts
   useEffect(() => {
-    if (!hasMounted.current) {
-      hasMounted.current = true;
-      return;
+    if (!isAuthLoading) {
+      if (!isAuthenticated) {
+        toast("You’ve been logged out", {
+          icon: <LogOut className="text-zinc-400" />,
+        });
+      } else {
+        toast(`Welcome, ${user?.name}`, {
+          icon: <UserRoundCheck className="text-green-400" />,
+        });
+      }
     }
-
-    if (isAuthenticated && user?.name && user?.emailVerified) {
-
-    }
-
-    if (!isAuthenticated) {
-      toast("You’ve been logged out", {
-        icon: <LogOut className="text-zinc-400" />,
-      });
-    }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, isAuthLoading]);
 
   return (
     <Router>
@@ -77,6 +78,8 @@ const App = () => {
         }}
       />
 
+      {showProfileModal && <Profile />}
+
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/shop" element={<Shop />} />
@@ -87,7 +90,15 @@ const App = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/checkout" element={<CheckoutWrapper />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route
+          path="/admin/dashboard"
+          element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          }
+        />
       </Routes>
     </Router>
   );
