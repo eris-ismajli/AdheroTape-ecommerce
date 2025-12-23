@@ -1,19 +1,23 @@
 import React, { useEffect, useState } from "react";
 import "../index.css";
 
-import { UserRound, ShoppingCart, Heart } from "lucide-react";
+import { UserRound, ShoppingCart, Heart, UserRoundCog } from "lucide-react";
 
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import ShopHero from "../components/ShopHero";
 import ProductsList from "../components/ProductsList";
+import { useSelector } from "react-redux";
 
 const Shop = () => {
+  const user = useSelector((state) => state.auth.user)
   const navLinks = [{ name: "About", endpoint: "/" }];
+  const ProfileIcon = user?.role === "admin" ? UserRoundCog : UserRound
+
   const navButtons = [
     { name: "Wishlist", icon: Heart, endpoint: "/wishlist" },
     { name: "Cart", icon: ShoppingCart, endpoint: "/cart" },
-    { name: "Profile", icon: UserRound, endpoint: "/login" },
+    { name: "Profile", icon: ProfileIcon, endpoint: "/login" },
   ];
 
   const [isAsideSticky, setIsAsideSticky] = useState(false);

@@ -312,7 +312,7 @@ const ProductsList = () => {
   }, [category, search]);
 
   return (
-    <section className="relative py-32 text-white border-b border-white/5 px-20">
+    <section className="relative w-full px-6 lg:px-20 py-7 lg:py-10 text-white border-b border-white/5">
       {/* TITLE */}
       <div className="text-center transition-all duration-1000 opacity-100 translate-y-0">
         <h2 className="text-3xl font-light bg-clip-text text-transparent bg-gradient-to-r from-white to-yellow-400">
@@ -325,59 +325,111 @@ const ProductsList = () => {
       </div>
 
       {/* Category Filter */}
-      <div className="mt-14 flex gap-8 justify-between items-center bg-gray-900 rounded-full p-3 px-5">
-        <div className="flex items-center gap-4">
+      <div className="mt-8 sm:mt-10  flex flex-col md:flex-row gap-4 md:gap-6 justify-between items-start md:items-center bg-gray-900 rounded-2xl md:rounded-full p-4 sm:p-3 sm:px-5">
+        {/* Left Section */}
+        <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
           <button
             onClick={() => setShowSidebar((p) => !p)}
-            className="border border-blue-300 p-3 rounded-full bg-black/25 text-white/70 hover:text-black hover:bg-blue-300"
+            className="border border-blue-300 p-2.5 sm:p-3 rounded-full bg-black/25 text-white/70 hover:text-black hover:bg-blue-300 transition-colors duration-300 flex-shrink-0"
           >
-            <SlidersHorizontal size={17} />
+            <SlidersHorizontal size={16} sm:size={17} />
           </button>
-          <h1 className="text-white/60 flex">
+          <h1 className="text-white/60 flex items-center text-sm sm:text-base md:text-lg">
             {headerTitle}
-            <span className="ml-2 text-xs font-semibold w-6 h-6 flex items-center justify-center rounded bg-red-600 text-white shadow-[0_0_10px_rgba(255,0,0,0.6)]">
+            <span className="ml-2 text-xs font-semibold w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded bg-red-600 text-white shadow-[0_0_10px_rgba(255,0,0,0.6)]">
               {tapeNumber}
             </span>
           </h1>
         </div>
-        <div className="flex items-center gap-6">
-          <div className="flex gap-6">
-            {CATEGORY_FILTERS.map((filter, index) => (
-              <button
-                onClick={() => {
-                  if (filter !== category) {
-                    changeCategory(filter);
-                  } else {
-                    changeCategory("All Tapes");
-                  }
-                }}
-                key={index}
-                className={`border border-blue-300 px-4 py-2 rounded-full
-           transition-all duration-300 text-[11px] uppercase tracking-[0.2em] scale-105
-           hover:bg-blue-300 hover:text-black ${
-             filter === category
-               ? "bg-blue-500 text-black border-none"
-               : "bg-black/25 text-white/70"
-           }`}
-              >
-                {filter}
-              </button>
-            ))}
+
+        {/* Right Section */}
+        <div className="flex  items-start sm:items-center gap-4 sm:gap-6 w-full sm:w-auto">
+          {/* Category Filters - Mobile Dropdown / Desktop Buttons */}
+          <div className="w-full sm:w-auto">
+            {/* Mobile Dropdown */}
+            <div className="xl:hidden w-full">
+              <div className="relative xl:hidden w-full">
+                <select
+                  value={category}
+                  onChange={(e) => changeCategory(e.target.value)}
+                  className="
+      w-full
+      appearance-none
+      border border-blue-300
+      px-4 py-2 pr-10
+      rounded-full
+      bg-gray-900/80
+      text-white/70 text-sm
+      focus:outline-none focus:border-blue-400
+      transition-all duration-300
+    "
+                >
+                  <option value="All Tapes">All Tapes</option>
+                  {CATEGORY_FILTERS.filter((f) => f !== "All Tapes").map(
+                    (filter) => (
+                      <option key={filter} value={filter}>
+                        {filter}
+                      </option>
+                    )
+                  )}
+                </select>
+
+                {/* Custom chevron */}
+                <ChevronDown
+                  size={16}
+                  className="
+      pointer-events-none
+      absolute
+      right-4
+      top-1/2
+      -translate-y-1/2
+      text-white/50
+    "
+                />
+              </div>
+            </div>
+
+            {/* Desktop Buttons */}
+            <div className="hidden xl:flex flex-wrap gap-3 md:gap-4 lg:gap-6">
+              {CATEGORY_FILTERS.map((filter, index) => (
+                <button
+                  onClick={() => {
+                    if (filter !== category) {
+                      changeCategory(filter);
+                    } else {
+                      changeCategory("All Tapes");
+                    }
+                  }}
+                  key={index}
+                  className={`border border-blue-300 px-4 py-2 rounded-full
+              transition-all duration-300 text-[11px] uppercase tracking-[0.2em] scale-105
+              hover:bg-blue-300 hover:text-black whitespace-nowrap ${
+                filter === category
+                  ? "bg-blue-500 text-black border-none"
+                  : "bg-black/25 text-white/70"
+              }`}
+                >
+                  {filter}
+                </button>
+              ))}
+            </div>
           </div>
-          <div className="flex items-center gap-6">
-            <div className="relative flex items-center max-w-md transition-all duration-300">
+
+          {/* Search Bar */}
+          <div className="flex items-center w-full sm:w-auto">
+            <div className="relative flex items-center w-full sm:max-w-md transition-all duration-300">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search color="gray" size={18} />
+                <Search color="gray" size={16} sm:size={18} />
               </div>
               <input
                 type="search"
                 className="
-          w-[15rem]
-          pl-10 pr-4 py-1.5 font-normal rounded-full border border-gray-500/50 scale-105
-          focus:w-[20rem]
-          focus:outline-none focus:border-blue-400
-          transition-all duration-300 bg-black/25 placeholder-zinc-600
-        "
+            w-full
+            pl-9 pr-4 py-2 sm:pl-10 sm:pr-4 sm:py-1.5 font-normal rounded-full border border-gray-500/50 scale-105
+            focus:outline-none focus:border-blue-400
+            transition-all duration-300 bg-black/25 placeholder-zinc-600
+            text-sm sm:text-base
+          "
                 placeholder="Search Tapes..."
                 value={searchDraft}
                 onChange={onSearchChange}

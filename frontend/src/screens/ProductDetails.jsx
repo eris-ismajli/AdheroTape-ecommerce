@@ -9,6 +9,7 @@ import {
   ShoppingCart,
   Sparkles,
   UserRound,
+  UserRoundCog,
   X,
 } from "lucide-react";
 import axiosInstance from "../utils/axiosInstance";
@@ -163,10 +164,11 @@ const ProductDetails = () => {
     "Premium professional-grade tape engineered for clean removal, strong adhesion, and reliable performance in demanding environments.";
 
   const navLinks = [{ name: "About", endpoint: "/" }];
+  const ProfileIcon = authUser?.role === "admin" ? UserRoundCog : UserRound
   const navButtons = [
     { name: "Wishlist", icon: Heart, endpoint: "/wishlist" },
     { name: "Cart", icon: ShoppingCart, endpoint: "/cart" },
-    { name: "Profile", icon: UserRound, endpoint: "/login" },
+    { name: "Profile", icon: ProfileIcon, endpoint: "/login" },
   ];
 
   const handleAddToCart = () => {

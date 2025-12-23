@@ -100,10 +100,10 @@ const ShopHero = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-screen text-white flex items-center overflow-hidden "
+      className="relative w-full text-white flex items-center overflow-hidden "
     >
 
-      <div className="mx-auto px-6 py-10 pt-28 lg:px-20 grid lg:grid-cols-2 gap-20 z-10">
+      <div className="mx-auto w-full px-8 md:px-14 py-10 pt-28 xl:pt-40 lg:px-20 grid lg:grid-cols-2 gap-20 z-10">
         {/* LEFT */}
         <div
           className={`flex flex-col justify-center transition-all duration-1000 ${
@@ -111,7 +111,7 @@ const ShopHero = () => {
           }`}
         >
           {/* Heading with gradient */}
-          <h1 className="text-6xl lg:text-7xl font-bold leading-tight mb-8">
+          <h1 className="text-6xl md:text-6xl font-bold leading-tight mb-8">
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-yellow-400">
               Discover
             </span>
@@ -120,7 +120,7 @@ const ShopHero = () => {
               Industrial-Grade
             </span>
             <br />
-            <span className="text-4xl lg:text-5xl font-light">
+            <span className="text-3xl md:text-4xl xl:text-5xl font-light">
               Tape Solutions
             </span>
           </h1>
@@ -128,7 +128,7 @@ const ShopHero = () => {
           {/* Subtitle with icon */}
           <div className="flex items-start gap-3 mb-10">
             <Zap className="w-5 h-5 mt-1 flex-shrink-0" style={{ color: "rgb(1, 160, 242)" }}/>
-            <p className="text-gray-300 text-xl max-w-lg leading-relaxed">
+            <p className="text-gray-300 text-base lg:text-xl max-w-lg leading-relaxed">
               <span
                 className="font-semibold"
                 style={{ color: "rgb(1, 160, 242)" }}
@@ -191,19 +191,19 @@ const ShopHero = () => {
         </div>
 
         {/* RIGHT - Enhanced Image Container */}
-        <div className="relative">
+        <div className="relative hidden lg:block">
           <div
             ref={imageRef}
             className="relative overflow-hidden transition-transform duration-300 ease-out"
             style={{
               transformStyle: "preserve-3d",
-              transform: "perspective(1000px) rotateX(0deg) rotateY(0deg)",
+              transform: "perspective(2000px) rotateX(deg) rotateY(0deg)",
             }}
           >
             <img
               src={shopHeroImg}
               alt="Premium Product Showcase"
-              className="w-full h-[600px] object-cover scale-105 hover:scale-100 transition-transform duration-700"
+              className="w-[100%] h-[500px] object-cover scale-105 hover:scale-100 transition-transform duration-700"
             />
           </div>
 

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { ArrowRight, Heart, ShoppingCart, UserRound, X } from "lucide-react";
+import { ArrowRight, Heart, ShoppingCart, UserRound, UserRoundCog, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import { removeProduct, clearCart } from "../store/cart/actions";
@@ -16,10 +16,14 @@ const Wishlist = () => {
   const items = useSelector((state) => state.wishlist.items || []);
   const totalItems = useSelector(selectWishlistCount);
 
+  const user = useSelector((state) => state.auth.user)
+
   const navLinks = [{ name: "About", endpoint: "/" }];
+  const ProfileIcon = user?.role === "admin" ? UserRoundCog : UserRound
+
   const navButtons = [
     { name: "Cart", icon: ShoppingCart, endpoint: "/cart" },
-    { name: "Profile", icon: UserRound, endpoint: "/login" },
+    { name: "Profile", icon: ProfileIcon, endpoint: "/login" },
   ];
 
   return (

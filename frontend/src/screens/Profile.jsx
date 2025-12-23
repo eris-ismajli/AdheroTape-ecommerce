@@ -2,11 +2,19 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUserName, updateUserPass } from "../store/auth/actions";
 import toast from "react-hot-toast";
-import { Check, Heart, ShoppingCart, UserRound, X } from "lucide-react";
+import {
+  ArrowRight,
+  Check,
+  Heart,
+  ShoppingCart,
+  UserRound,
+  X,
+} from "lucide-react";
 import Header from "../components/Header";
 import { useProfileModal } from "../components/ProfileModalContext";
 import { Eye, EyeOff } from "lucide-react";
 import Modal from "../components/Modal";
+import { useNavigate, useNavigation } from "react-router-dom";
 
 const Profile = () => {
   const { setShowProfileModal } = useProfileModal();
@@ -22,6 +30,8 @@ const Profile = () => {
   const [showNewPassword, setShowNewPassword] = useState(false);
 
   const [showPassModal, setShowPassModal] = useState(false);
+
+  const navigate = useNavigate();
 
   const oldName = user?.name;
 
@@ -75,7 +85,7 @@ const Profile = () => {
       });
     }
 
-    setShowPassModal(false)
+    setShowPassModal(false);
   };
 
   const handlePassChange = () => {
@@ -103,7 +113,7 @@ const Profile = () => {
       return;
     }
 
-    setShowPassModal(true)
+    setShowPassModal(true);
   };
 
   return (
@@ -145,12 +155,48 @@ const Profile = () => {
 
         {/* Header */}
         <div style={{ margin: "0" }} className="text-center">
+          <p className="text-xs tracking-widest text-blue-500">
+            {user?.role?.toUpperCase()}
+          </p>
           <h1 className="text-2xl font-semibold">Profile</h1>
           <p className="text-sm text-zinc-400">{user?.email}</p>
+          {user?.role === "admin" && (
+            <button
+              onClick={() => {
+                navigate("/admin/dashboard");
+                setShowProfileModal(false);
+              }}
+              className="
+    group flex w-full justify-center items-center gap-2 mt-1
+    text-blue-300 font-medium
+    transition-all duration-200 ease-out
+    hover:text-blue-200
+  "
+            >
+              <span className="relative">
+                Admin Dashboard
+                <span
+                  className="
+        absolute left-0 -bottom-0.5 h-[1px] w-0
+        bg-blue-300 transition-all duration-200
+        group-hover:w-full
+      "
+                />
+              </span>
+
+              <ArrowRight
+                size={20}
+                className="
+      transition-transform duration-200
+      group-hover:translate-x-1
+    "
+              />
+            </button>
+          )}
         </div>
 
-        {/* Display / Edit Name */}
-        {/* ⬇️ KEEP YOUR EXISTING CONTENT BELOW */}
+        <div className="border-t border-zinc-800" />
+
 
         {/* Display / Edit Name */}
         <div className="space-y-3">
